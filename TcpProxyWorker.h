@@ -7,6 +7,14 @@
 #include "TITMParms.h"
 
 
+	enum class TcpProxyDirection
+	{
+		SrcToDest = 0,
+		DestToSrc = 1
+	};
+
+
+
 class TcpProxyWorker
 {
 public:
@@ -14,8 +22,14 @@ public:
 	virtual ~TcpProxyWorker() {}
 	virtual void Start();
 	virtual void Stop();
+	
 
 protected:
+	virtual void InvokeUserRoutine(std::vector<char>& DataBuffer, TcpProxyDirection Direction);
+	virtual std::string GetTempFilePath();
+	virtual void UpdateBufferFromScriptOutput(const std::string& OutputFile, std::vector<char>& DataBuffer);
+	virtual void AttemptToReadMore(int AdditionalBytesRequested, std::vector<char>& DataBuffer);
+	virtual void WriteDataBufferToFile(std::vector<char>& DataBuffer, const std::string& OutputFile);
 	TcpSocket       m_SourceSocket;
 	TcpClientSocket m_TargetSocket;
 	bool            m_bStopped;

@@ -69,7 +69,7 @@ int __cdecl main(int argc, char **argv)
 	TITMParms Parms = ParseParameters(argc, argv);
 	InitWinsock();
 	
-	
+	Parms.ScriptPath = "c:\\temp\\MyScript.ps1";
 	//TcpProxy TITMProxy("1234", "www.israelnationalnews.com", "80");
 	TcpProxy TITMProxy(Parms, "443", "he.wikipedia.org", "443");
 
