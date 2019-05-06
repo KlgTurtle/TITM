@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <iomanip>
 
 TcpProxyWorker::TcpProxyWorker(const TITMParms& Parms, TcpSocket SourceSocket, const std::string & TargetAddress, 
 	const std::string & TargetPort) : m_Parms(Parms),
@@ -25,7 +27,7 @@ void TcpProxyWorker::Start()
 			bool bHaveData = SocketSelector.SelectForRead();
 			if (bHaveData)
 			{
-				if (m_SourceSocket.ReceiveBuffer(DataBuffer))
+				if (m_SourceSocket.ReceiveBufferWithMax(DataBuffer, MAX_DATA_BUFFER_SIZE))
 				{
 					if (m_Parms.bPrintSrc)
 					{
@@ -36,7 +38,7 @@ void TcpProxyWorker::Start()
 					m_TargetSocket.SendBufferAll(DataBuffer);
 				}
 
-				if (m_TargetSocket.ReceiveBuffer(DataBuffer))
+				if (m_TargetSocket.ReceiveBufferWithMax(DataBuffer, MAX_DATA_BUFFER_SIZE))
 				{
 					if (m_Parms.bPrintDst)
 					{
@@ -103,9 +105,32 @@ void TcpProxyWorker::UpdateBufferFromScriptOutput(const std::string & OutputFile
 	}
 }
 
-void TcpProxyWorker::AttemptToReadMore(int AdditionalBytesRequested, std::vector<char>& DataBuffer)
+bool TcpProxyWorker::AttemptToReadMore(int AdditionalBytesRequested, std::vector<char>& DataBuffer, const TcpProxyDirection & Direction)
 {
+	bool bSuccess = false;
+
+	std::vector<char> NewDataBuffer;
+	if (Direction == TcpProxyDirection::SrcToDest)
+	{	
+		bSuccess = m_SourceSocket.ReceiveBufferExact(NewDataBuffer, AdditionalBytesRequested);
+	}
+	else
+	{
+		bSuccess = m_TargetSocket.ReceiveBufferExact(NewDataBuffer, AdditionalBytesRequested);
+	}
+
+	if (bSuccess)
+	{
+		DataBuffer.insert(DataBuffer.end(), NewDataBuffer.begin(), NewDataBuffer.end());
+		if (DataBuffer.size() > MAX_DATA_BUFFER_SIZE)
+		{
+			DataBuffer = std::vector<char>(DataBuffer.end() - MAX_DATA_BUFFER_SIZE, DataBuffer.end());
+		}
+	}
+
+	return bSuccess;
 }
+
 
 void TcpProxyWorker::WriteDataBufferToFile(std::vector<char>& DataBuffer, const std::string & OutputFile)
 {
@@ -127,30 +152,44 @@ void TcpProxyWorker::InvokeUserRoutine(std::vector<char>& DataBuffer, TcpProxyDi
 		{
 			std::string TempOutput = GetTempFilePath();
 
-			WriteDataBufferToFile(DataBuffer, TempOutput);
+			std::stringstream DataBufferHexEncoded;
+
+			DataBufferHexEncoded.clear();
+
+			std::for_each(DataBuffer.begin(), DataBuffer.end(),
+				[&DataBufferHexEncoded](const char &c) 
+			{ 
+				DataBufferHexEncoded << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<unsigned int>(c);
+			});
+			const std::string PsCommand = "powershell.exe -executionpolicy bypass -windowstyle hidden -noninteractive -nologo -file ";
 
 			std::string PsParameters = " " +
 				std::to_string(InvocationNumber) + " " +
 			 	std::to_string(static_cast<unsigned int>(Direction)) + " " +
-				TempOutput;
+				DataBufferHexEncoded.str();
 
-			std::string PsExecuteCmd = "powershell.exe -windowstyle hidden -file " + m_Parms.ScriptPath + PsParameters;
+			std::string PsExecuteCmd = PsCommand + m_Parms.ScriptPath + PsParameters;
 
 			int AdditionalBytesRequested = system(PsExecuteCmd.c_str());
-							
-			if (AdditionalBytesRequested == 0)
+			
+			// Return code logic:
+			// Negative: no need to reinvoke, and buffer was not updated
+			// Zero:     no need to reinvoke, updated buffer was written to file
+			// Positive: need to reinvoke after reading additional bytes, specified by value.
+			if (AdditionalBytesRequested < 0)
+			{
+				bInvokeAgain = false;
+			}
+			else if (AdditionalBytesRequested == 0)
 			{
 				UpdateBufferFromScriptOutput(TempOutput, DataBuffer);
 				bInvokeAgain = false;
 			}
-			else if (AdditionalBytesRequested > 0)
+			else 
 			{
-				AttemptToReadMore(AdditionalBytesRequested, DataBuffer);
+				bInvokeAgain = AttemptToReadMore(AdditionalBytesRequested, DataBuffer, Direction);
 			}
-			else
-			{
-				throw std::runtime_error("Illegal return value received from user powershell script: " + m_Parms.ScriptPath);
-			}
+			
 
 			DeleteFile(TempOutput.c_str());
 

@@ -45,6 +45,50 @@ void TcpSocket::SendBufferAll(const std::vector<char>& Data)
 	}
 }
 
+bool TcpSocket::ReceiveBufferWithMax(std::vector<char>& Data, int MaxSize)
+{
+	unsigned long BytesToReceive = GetPendingBytes();
+	if (BytesToReceive > MaxSize)
+	{
+		BytesToReceive = MaxSize;
+	}
+
+	int NumReceived = ReceiveBufferInternal(Data, BytesToReceive);
+	return (NumReceived > 0);
+}
+
+bool TcpSocket::ReceiveBufferExact(std::vector<char>& Data, int ExactSizeRequired)
+{
+	unsigned long PendingBytes = GetPendingBytes();
+	if (PendingBytes < ExactSizeRequired)
+	{
+		return false;
+	}
+	else
+	{
+		int NumReceived = ReceiveBufferInternal(Data, ExactSizeRequired);
+		return (NumReceived == ExactSizeRequired);
+	}
+}
+
+
+
+int TcpSocket::ReceiveBufferInternal(std::vector<char>& Data, int LengthToReceive)
+{
+	Data.resize(LengthToReceive);
+	int NumReceived = recv(m_Socket, Data.data(), Data.size(), 0);
+	if (NumReceived == SOCKET_ERROR)
+	{
+		throw std::runtime_error("TcpSocket::ReceiveBuffer::recv failed, WSALastErr: " + WSAGetLastError());
+	}
+	else if ((NumReceived > 0) && (NumReceived < Data.size()))
+	{
+		Data.resize(NumReceived);
+	}
+
+	return NumReceived;
+}
+
 bool TcpSocket::ReceiveBuffer(std::vector<char>& Data)
 {
 	bool bReceivedSomething = false;
@@ -52,28 +96,11 @@ bool TcpSocket::ReceiveBuffer(std::vector<char>& Data)
 
 	if (PendingBytes > 0)
 	{
-		Data.resize(GetPendingBytes());
-		int NumReceived = recv(m_Socket, Data.data(), Data.size(), 0);
-		if (NumReceived == SOCKET_ERROR)
+		int NumReceived = ReceiveBufferInternal(Data, PendingBytes);
+		if (NumReceived > 0)
 		{
-			throw std::runtime_error("TcpSocket::ReceiveBuffer::recv failed, WSALastErr: " + WSAGetLastError());
-		}
-		else if (NumReceived > 0) 
-		{
-			if (NumReceived < Data.size())
-			{
-				Data.resize(NumReceived);
-			}
 			bReceivedSomething = true;
 		}
-		else
-		{
-			bReceivedSomething = false;
-		}
-	}
-	else
-	{
-		bReceivedSomething = false;
 	}
 
 	return bReceivedSomething;

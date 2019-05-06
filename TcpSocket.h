@@ -16,6 +16,9 @@ public:
 	virtual unsigned long GetPendingBytes();
 	virtual int SendBuffer(const std::vector<char>& Data);
 	virtual void SendBufferAll(const std::vector<char>& Data);
+	virtual bool ReceiveBufferWithMax(std::vector<char>& Data, int MaxSize);
+	virtual bool ReceiveBufferExact(std::vector<char>& Data, int ExactSizeRequired);
+	virtual int  ReceiveBufferInternal(std::vector<char>& Data, int LengthToReceive);
 	virtual bool ReceiveBuffer(std::vector<char>& Data);
 	virtual bool IsConnected();
 	virtual void SetBlocking(bool IsBlocking);
