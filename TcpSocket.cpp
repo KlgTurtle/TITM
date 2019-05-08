@@ -48,6 +48,12 @@ void TcpSocket::SendBufferAll(const std::vector<char>& Data)
 bool TcpSocket::ReceiveBufferWithMax(std::vector<char>& Data, int MaxSize)
 {
 	unsigned long BytesToReceive = GetPendingBytes();
+
+	if (BytesToReceive == 0)
+	{
+		return false;
+	}
+
 	if (BytesToReceive > MaxSize)
 	{
 		BytesToReceive = MaxSize;

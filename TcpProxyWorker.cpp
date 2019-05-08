@@ -24,6 +24,7 @@ void TcpProxyWorker::Start()
 		TcpSocketSelector SocketSelector({ m_SourceSocket , m_TargetSocket });
 		while (!m_bStopped)
 		{
+			
 			bool bHaveData = SocketSelector.SelectForRead();
 			if (bHaveData)
 			{
@@ -89,6 +90,7 @@ std::string TcpProxyWorker::GetTempFilePath()
 
 void TcpProxyWorker::UpdateBufferFromScriptOutput(const std::string & OutputFile, std::vector<char>& DataBuffer)
 {
+	std::vector<char> tempold = DataBuffer;
 	std::ifstream file(OutputFile, std::ios::binary | std::ios::ate);
 	std::streamsize size = file.tellg();
 	file.seekg(0, std::ios::beg);
@@ -157,15 +159,16 @@ void TcpProxyWorker::InvokeUserRoutine(std::vector<char>& DataBuffer, TcpProxyDi
 			DataBufferHexEncoded.clear();
 
 			std::for_each(DataBuffer.begin(), DataBuffer.end(),
-				[&DataBufferHexEncoded](const char &c) 
+				[&DataBufferHexEncoded](const unsigned char &c) 
 			{ 
 				DataBufferHexEncoded << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << static_cast<unsigned int>(c);
 			});
 			const std::string PsCommand = "powershell.exe -executionpolicy bypass -windowstyle hidden -noninteractive -nologo -file ";
-
+			//const std::string PsCommand = "powershell.exe -executionpolicy bypass -nologo -file ";
 			std::string PsParameters = " " +
 				std::to_string(InvocationNumber) + " " +
 			 	std::to_string(static_cast<unsigned int>(Direction)) + " " +
+				TempOutput + " " +
 				DataBufferHexEncoded.str();
 
 			std::string PsExecuteCmd = PsCommand + m_Parms.ScriptPath + PsParameters;
