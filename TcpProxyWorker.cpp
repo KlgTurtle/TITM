@@ -1,5 +1,6 @@
 #include "TcpProxyWorker.h"
 #include "TcpSocketSelector.h"
+#include "TLS.h"
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -30,23 +31,13 @@ void TcpProxyWorker::Start()
 			{
 				if (m_SourceSocket.ReceiveBufferWithMax(DataBuffer, MAX_DATA_BUFFER_SIZE))
 				{
-					if (m_Parms.bPrintSrc)
-					{
-						m_Parms.Printer->Print(DataBuffer);
-					}
-
-					InvokeUserRoutine(DataBuffer, TcpProxyDirection::SrcToDest);
+					DoParamDefinedActions(DataBuffer, TcpProxyDirection::SrcToDest);
 					m_TargetSocket.SendBufferAll(DataBuffer);
 				}
 
 				if (m_TargetSocket.ReceiveBufferWithMax(DataBuffer, MAX_DATA_BUFFER_SIZE))
 				{
-					if (m_Parms.bPrintDst)
-					{
-						m_Parms.Printer->Print(DataBuffer);
-					}
-
-					InvokeUserRoutine(DataBuffer, TcpProxyDirection::DestToSrc);
+					DoParamDefinedActions(DataBuffer, TcpProxyDirection::DestToSrc);
 					m_SourceSocket.SendBufferAll(DataBuffer);
 				}
 			}
@@ -139,6 +130,67 @@ void TcpProxyWorker::WriteDataBufferToFile(std::vector<char>& DataBuffer, const 
 	std::ofstream file(OutputFile, std::ios::binary | std::ios::trunc);
 	file.write(DataBuffer.data(), DataBuffer.size());
 	file.close();
+}
+
+void TcpProxyWorker::DoParamDefinedActions(std::vector<char>& DataBuffer, const TcpProxyDirection& Direction)
+{
+	if ((Direction == TcpProxyDirection::SrcToDest && m_Parms.bPrintSrc) || 
+		(Direction == TcpProxyDirection::DestToSrc && m_Parms.bPrintDst))
+	{
+		if (m_Parms.bDecodeAsTLS)
+		{
+			TLSPlaintextHeader* TLSHeader = reinterpret_cast<TLSPlaintextHeader*>(DataBuffer.data());
+			if (DataBuffer.size() >= sizeof(TLSPlaintextHeader))
+			{
+				std::string ContentTypeStr = "";
+				switch (TLSHeader->type)
+				{
+				case ContentType::change_cipher_spec:
+					ContentTypeStr = "Change Cipher Spec";
+					break;
+				case	ContentType::alert:
+					ContentTypeStr = "Alert";
+					break;
+				case	ContentType::handshake:
+					ContentTypeStr = "Handshake";
+					break;
+				case	ContentType::application_data:
+					ContentTypeStr = "Application Data";
+					break;
+				default:
+					ContentTypeStr = "*Unknown*";
+					break;
+				}
+
+				std::string VersionStr = "";
+				if (TLSHeader->version.major == 3 && TLSHeader->version.minor >= 1)
+				{
+					VersionStr = "TLSv1." + std::to_string(TLSHeader->version.minor-1);
+				}
+				else
+				{
+					VersionStr += "SSLv" + std::to_string(TLSHeader->version.major) + ".0";
+				}
+
+				std::string LengthStr = std::to_string(TLSHeader->length);
+
+				m_Parms.Printer->PrintRegular("TLS Header\n"     
+					                          "==========\n"
+											  "Content Type:" + ContentTypeStr + "\n"
+										      "Version:     " + VersionStr + "\n" +
+										      "Length:      " + LengthStr + "\n");
+
+			}
+		}
+		else
+		{
+			m_Parms.Printer->PrintRegular(Direction == TcpProxyDirection::SrcToDest ?
+				"Source->Dest" : "Dest->Source");
+			m_Parms.Printer->Print(DataBuffer);
+		}
+	}
+
+	//InvokeUserRoutine(DataBuffer, Direction);
 }
 
 

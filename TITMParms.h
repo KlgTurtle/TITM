@@ -10,6 +10,7 @@ public:
 	}
 	bool bPrintSrc = false;
 	bool bPrintDst = false;
+	bool bDecodeAsTLS = false;
 	std::shared_ptr<HexPrinter> Printer;
 	std::string                 ScriptPath;
 };

@@ -9,6 +9,7 @@ class HexPrinter
 public:
 	HexPrinter(FILE* Dest);
 	HexPrinter(FILE* Dest, bool bInterlocked);
+	virtual void PrintRegular(const std::string & StrToPrint);
 	virtual ~HexPrinter();
 
 	virtual void Print(std::vector<char> Buffer);

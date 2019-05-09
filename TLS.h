@@ -1,5 +1,8 @@
 #pragma once
-enum class ContentType 
+
+#pragma pack(push, 1)
+
+enum class ContentType : unsigned char
 {
 	change_cipher_spec = 20,
 	alert = 21,
@@ -22,3 +25,4 @@ struct TLSPlaintextHeader
 
 
 
+#pragma pack(pop)

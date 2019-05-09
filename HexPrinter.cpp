@@ -19,6 +19,23 @@ HexPrinter::HexPrinter(FILE* Dest, bool bInterlocked) : m_Dest(Dest), m_bInterlo
 	{
 		InitializeCriticalSection(&m_LockHandle);
 	}
+
+	
+}
+
+void HexPrinter::PrintRegular(const std::string& StrToPrint)
+{
+	if (m_bInterlocked)
+	{
+		EnterCriticalSection(&m_LockHandle);
+	}
+
+	printf("%s\n", StrToPrint.c_str());
+
+	if (m_bInterlocked)
+	{
+		LeaveCriticalSection(&m_LockHandle);
+	}
 }
 
 void HexPrinter::Print(std::vector<char> Buffer)

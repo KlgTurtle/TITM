@@ -41,9 +41,9 @@ int InitWinsock()
 TITMParms ParseParameters(int argc, char** argv)
 {
 	TITMParms retParms;
-	for (size_t i = 0; i < argc - 1; ++i)
+	for (size_t i = 1; i < argc; ++i)
 	{
-		std::string parm = argv[1];
+		std::string parm = argv[i];
 
 		if (parm == "-PrintSrc")
 		{
@@ -56,6 +56,10 @@ TITMParms ParseParameters(int argc, char** argv)
 		else if (parm == "-PrintBoth")
 		{
 			retParms.bPrintDst = retParms.bPrintSrc = true;
+		}
+		else if (parm == "-TLS")
+		{
+			retParms.bDecodeAsTLS = true;
 		}
 	}
 

@@ -30,6 +30,7 @@ protected:
 	virtual void UpdateBufferFromScriptOutput(const std::string& OutputFile, std::vector<char>& DataBuffer);
 	virtual bool AttemptToReadMore(int AdditionalBytesRequested, std::vector<char>& DataBuffer, const TcpProxyDirection& Direction);
 	virtual void WriteDataBufferToFile(std::vector<char>& DataBuffer, const std::string& OutputFile);
+	virtual void DoParamDefinedActions(std::vector<char>& DataBuffer, const TcpProxyDirection& Direction);
 	TcpSocket       m_SourceSocket;
 	TcpClientSocket m_TargetSocket;
 	bool            m_bStopped;
