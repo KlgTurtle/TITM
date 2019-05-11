@@ -141,24 +141,75 @@ std::shared_ptr<ITLSMessage> TLSState::GetClientHello()
 	ClientHelloHeader* CHHeader = 
 		reinterpret_cast<ClientHelloHeader*>(&m_CurrentMessageBuffer[Offset]);
 
+	// Build ClientHello Header
 	RetClientHello->Version = CHHeader->legacy_version;
 	memcpy(RetClientHello->random, CHHeader->random, sizeof(CHHeader->random));
-	RetClientHello->session_id_length = CHHeader->SessionIdLength;
+	//RetClientHello->session_id_length = CHHeader->SessionIdLength;
 
 	Offset += sizeof(ClientHelloHeader);
 
+	// Build ClientHello Session ID
 	RetClientHello->session_id.clear();
 	RetClientHello->session_id.insert(RetClientHello->session_id.begin(), &m_CurrentMessageBuffer[Offset],
 		&m_CurrentMessageBuffer[Offset + CHHeader->SessionIdLength]);
 
 	Offset += CHHeader->SessionIdLength;
 
+	// Build CipherSuites
 	unsigned short* CipherSuitesLengthBE = reinterpret_cast<unsigned short*>(&m_CurrentMessageBuffer[Offset]);
 	unsigned short CipherSuitesLength = ntohs(*CipherSuitesLengthBE);
 
+	Offset += sizeof(CipherSuitesLength);
 
-	return RetClientHello;
+	RetClientHello->cipher_suites.resize(CipherSuitesLength / 2);
+	memcpy(RetClientHello->cipher_suites.data(), &m_CurrentMessageBuffer[Offset], CipherSuitesLength);
+//	RetClientHello->cipher_suites.insert(RetClientHello->cipher_suites.begin(), 
+	//reinterpret_cast<unsigned char[]>(&m_CurrentMessageBuffer[Offset]),
+	//	reinterpret_cast<unsigned char[]>(&m_CurrentMessageBuffer[Offset + CipherSuitesLength]));
+
+	Offset += CipherSuitesLength;
+
+	// Build Compression Methods
+	unsigned char compression_methods_length = m_CurrentMessageBuffer[Offset];
+	Offset += sizeof(compression_methods_length);
+	RetClientHello->compression_methods.clear();
+	RetClientHello->compression_methods.insert(RetClientHello->compression_methods.begin(),
+		&m_CurrentMessageBuffer[Offset], &m_CurrentMessageBuffer[Offset + compression_methods_length]);
+
+	Offset += compression_methods_length;
+
+	// Build Extensions
+
 	
+	
+	GetExtensions(Offset, RetClientHello->extensions);
+
+
+	return RetClientHello;	
+}
+
+void TLSState::GetExtensions(size_t& Offset, std::vector<std::shared_ptr<ITLSExtension>>& Extensions)
+{
+	unsigned short* ExtensionsLengthBE = reinterpret_cast<unsigned short*>(&m_CurrentMessageBuffer[Offset]);
+	short ExtensionsLength = ntohs(*ExtensionsLengthBE);
+
+	Offset += sizeof(ExtensionsLength);
+
+	while (ExtensionsLength > 0)
+	{
+		ExtensionType ExtType =
+			static_cast<ExtensionType>(ntohs(*reinterpret_cast<unsigned short*>(&m_CurrentMessageBuffer[Offset])));
+		Offset += sizeof(ExtensionType);
+
+		unsigned short* ExtLengthBE = reinterpret_cast<unsigned short*>(&m_CurrentMessageBuffer[Offset]);
+		unsigned short ExtLength = ntohs(*ExtLengthBE);
+		Offset += sizeof(ExtLength);
+
+		// Handle extension here
+
+		Offset += ExtLength;
+		ExtensionsLength -= (ExtLength + sizeof(ExtensionType) + sizeof(ExtLength));
+	}
 }
 
 
