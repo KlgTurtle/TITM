@@ -5,6 +5,7 @@
 #include "TcpSocket.h"
 #include <memory>
 #include "TITMParms.h"
+#include "TLSState.h"
 
 
 	enum class TcpProxyDirection
@@ -35,5 +36,8 @@ protected:
 	TcpClientSocket m_TargetSocket;
 	bool            m_bStopped;
 	TITMParms       m_Parms;
+
+	TLSState m_SourceTLSState;
+	TLSState m_TargetTLSState;
 	
 };
