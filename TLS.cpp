@@ -1,11 +1,5 @@
 #include "TLS.h"
 
-std::string ClientHello::ToString()
-{
-	std::string TLSHeader = ITLSMessage::ToString();
-
-	return "";
-}
 
 std::string ITLSMessage::ToString()
 {
