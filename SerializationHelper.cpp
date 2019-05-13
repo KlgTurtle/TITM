@@ -33,6 +33,36 @@ std::string SerializationHelper::DeserializeString(const std::vector<char>& Buff
 	return Str;
 }
 
+std::vector<unsigned short> SerializationHelper::DeserializeUShortVec(const std::vector<char>& Buffer, size_t & Offset, size_t LenLen)
+{
+	size_t VecSize;
+	std::vector<unsigned short> Result;
+
+	// This is the length of the length value that precedes the list.
+	switch (LenLen)
+	{
+	case sizeof(unsigned char) :
+		VecSize = DeserializeUnsignedChar(Buffer, Offset);
+		break;
+	case sizeof(unsigned short) :
+		VecSize = DeserializeUnsignedShort(Buffer, Offset);
+		break;
+	case sizeof(unsigned int) :
+		VecSize = DeserializeUnsignedInt(Buffer, Offset);
+		break;
+	default:
+		break;
+	}
+
+	for (size_t i = 0; i < VecSize / sizeof(unsigned short); ++i)
+	{
+		unsigned short UShort = DeserializeUnsignedShort(Buffer, Offset);
+		Result.push_back(UShort);
+	}
+
+	return Result;
+}
+
 void SerializationHelper::SerializeUnsignedShort(unsigned short UShort, std::vector<char>& Buffer, size_t & Offset)
 {
 	unsigned short UShortBE = htons(UShort);

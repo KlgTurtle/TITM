@@ -9,6 +9,7 @@ public:
 	static unsigned int DeserializeUnsignedInt(const std::vector<char>& Buffer, size_t& Offset);
 	static unsigned char DeserializeUnsignedChar(const std::vector<char>& Buffer, size_t& Offset);
 	static std::string DeserializeString(const std::vector<char>& Buffer, size_t& Offset, const size_t& Length);
+	static std::vector<unsigned short> DeserializeUShortVec(const std::vector<char>& Buffer, size_t& Offset, size_t LenLen);
 
 	static void SerializeUnsignedShort(unsigned short UShort, std::vector<char>& Buffer, size_t& Offset);
 	static void SerializeUnsignedInt(unsigned int UInt, std::vector<char>& Buffer, size_t& Offset);

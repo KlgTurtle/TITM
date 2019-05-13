@@ -40,13 +40,15 @@ void ClientHello::Deserialize(const std::vector<char>& Buffer)
 	Offset += CHHeader->SessionIdLength;
 
 	// Build CipherSuites
-	unsigned short CipherSuitesLength = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
+	/*unsigned short CipherSuitesLength = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
 
 	for (size_t i = 0; i < CipherSuitesLength / sizeof(unsigned short); ++i)
 	{
 		unsigned short CipherSuite = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
 		this->cipher_suites.push_back(CipherSuite);
-	}
+	}*/
+
+	this->cipher_suites = SerializationHelper::DeserializeUShortVec(Buffer, Offset, sizeof(unsigned short));
 
 
 	unsigned char compression_methods_length = Buffer[Offset];
