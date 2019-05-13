@@ -1,7 +1,10 @@
 #include <WinSock2.h>
 #include "TLS.h"
 #include "ServerNameExtension.h"
+#include "SupportedGroups.h"
 #include "ClientHello.h"
+#include "SerializationHelper.h"
+#include "ClientSupportedVersions.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -37,20 +40,15 @@ void ClientHello::Deserialize(const std::vector<char>& Buffer)
 	Offset += CHHeader->SessionIdLength;
 
 	// Build CipherSuites
-	const unsigned short* CipherSuitesLengthBE = reinterpret_cast<const unsigned short*>(&Buffer[Offset]);
-	unsigned short CipherSuitesLength = ntohs(*CipherSuitesLengthBE);
+	unsigned short CipherSuitesLength = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
 
-	Offset += sizeof(CipherSuitesLength);
+	for (size_t i = 0; i < CipherSuitesLength / sizeof(unsigned short); ++i)
+	{
+		unsigned short CipherSuite = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
+		this->cipher_suites.push_back(CipherSuite);
+	}
 
-	this->cipher_suites.resize(CipherSuitesLength / 2);
-	memcpy(this->cipher_suites.data(), &Buffer[Offset], CipherSuitesLength);
-	//	RetClientHello->cipher_suites.insert(RetClientHello->cipher_suites.begin(), 
-	//reinterpret_cast<unsigned char[]>(&m_CurrentMessageBuffer[Offset]),
-	//	reinterpret_cast<unsigned char[]>(&m_CurrentMessageBuffer[Offset + CipherSuitesLength]));
 
-	Offset += CipherSuitesLength;
-
-	// Build Compression Methods
 	unsigned char compression_methods_length = Buffer[Offset];
 	Offset += sizeof(compression_methods_length);
 	this->compression_methods.clear();
@@ -93,6 +91,11 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 			extensions.push_back(std::make_shared<ServerNameExtension>(Buffer, Offset));
 			break;
 		case ExtensionType::supported_groups:
+			extensions.push_back(std::make_shared<SupportedGroups>(Buffer, Offset));
+			break;
+		case ExtensionType::supported_versions:
+			extensions.push_back(std::make_shared<ClientSupportedVersions>(Buffer, Offset));
+			break;
 		case ExtensionType::ec_points_format:
 		case ExtensionType::extended_master_secret:
 		case ExtensionType::renegotiation_info:
@@ -122,7 +125,7 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		//	break;
 		case ExtensionType::early_data:
 			//break;
-		case ExtensionType::supported_versions:
+		
 		//	break;
 		case ExtensionType::cookie:
 		//	break;

@@ -13,11 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Extensions">
-      <UniqueIdentifier>{ecee39ac-b952-4c11-b806-23f27e12a74a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\TLSMessages">
+    <Filter Include="TLSMessages">
       <UniqueIdentifier>{ff7af44a-42e6-4eb3-bc8e-6bc075fa8df4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extensions">
+      <UniqueIdentifier>{ecee39ac-b952-4c11-b806-23f27e12a74a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,10 +55,19 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClientHello.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>TLSMessages</Filter>
     </ClCompile>
     <ClCompile Include="ServerNameExtension.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="SupportedGroups.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="SerializationHelper.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientSupportedVersions.cpp">
+      <Filter>Extensions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,16 +105,25 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ClientHello.h">
-      <Filter>Header Files\TLSMessages</Filter>
+      <Filter>TLSMessages</Filter>
     </ClInclude>
     <ClInclude Include="ServerNameExtension.h">
-      <Filter>Header Files\Extensions</Filter>
+      <Filter>Extensions</Filter>
     </ClInclude>
     <ClInclude Include="ITLSExtension.h">
-      <Filter>Header Files\Extensions</Filter>
+      <Filter>Extensions</Filter>
     </ClInclude>
     <ClInclude Include="ITLSMessage.h">
-      <Filter>Header Files\TLSMessages</Filter>
+      <Filter>TLSMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="SupportedGroups.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="SerializationHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientSupportedVersions.h">
+      <Filter>Extensions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

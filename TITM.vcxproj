@@ -146,7 +146,10 @@
     <ClCompile Include="HexPrinter.cpp" />
     <ClCompile Include="ITcpProxyManipulator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SerializationHelper.cpp" />
     <ClCompile Include="ServerNameExtension.cpp" />
+    <ClCompile Include="SupportedGroups.cpp" />
+    <ClCompile Include="ClientSupportedVersions.cpp" />
     <ClCompile Include="TcpClientSocket.cpp" />
     <ClCompile Include="TcpListenSocket.cpp" />
     <ClCompile Include="TcpProxy.cpp" />
@@ -162,7 +165,10 @@
     <ClInclude Include="ITcpProxyManipulator.h" />
     <ClInclude Include="ITLSExtension.h" />
     <ClInclude Include="ITLSMessage.h" />
+    <ClInclude Include="SerializationHelper.h" />
     <ClInclude Include="ServerNameExtension.h" />
+    <ClInclude Include="SupportedGroups.h" />
+    <ClInclude Include="ClientSupportedVersions.h" />
     <ClInclude Include="TcpClientSocket.h" />
     <ClInclude Include="TcpListenSocket.h" />
     <ClInclude Include="TcpProxy.h" />

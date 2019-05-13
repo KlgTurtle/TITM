@@ -1,5 +1,6 @@
 #include <WinSock2.h>
 #include "ServerNameExtension.h"
+#include "SerializationHelper.h"
 
 ServerNameExtension::ServerNameExtension(const std::vector<char>& Buffer, size_t & Offset)
 {
@@ -14,52 +15,35 @@ void ServerNameExtension::Serialize(std::vector<char>& Buffer, size_t & Offset)
 		ListLength += sName.length() + sizeof(unsigned short) + 1;
 	}
 
-	unsigned short ListLengthBE = htons(ListLength);
-	memcpy(&Buffer[Offset], &ListLengthBE, sizeof(ListLengthBE));
-	Offset += sizeof(ListLengthBE);
+	SerializationHelper::SerializeUnsignedShort(ListLength, Buffer, Offset);
 
 	for each (const std::string& sName in ServerNamesList)
 	{
 		unsigned char sNameType = 0x00;
-		memcpy(&Buffer[Offset], &sNameType, sizeof(sNameType));
-		Offset += sizeof(sNameType);
+		SerializationHelper::SerializeUnsignedChar(sNameType, Buffer, Offset);
 
 		unsigned short SrvNameLen = sName.length();
-		unsigned short SrvNameLenBE = htons(SrvNameLen);
-		memcpy(&Buffer[Offset], &SrvNameLenBE, sizeof(SrvNameLenBE));
-		Offset += sizeof(SrvNameLenBE);
+		SerializationHelper::SerializeUnsignedShort(SrvNameLen, Buffer, Offset);	
+		SerializationHelper::SerializeString(sName, Buffer, Offset);
 
-		memcpy(&Buffer[Offset], sName.data(), SrvNameLen);
-		Offset += SrvNameLen;
 	}
 }
 
 void ServerNameExtension::Deserialize(const std::vector<char>& Buffer, size_t & Offset)
 {
-	const unsigned short* ListLengthBE = reinterpret_cast<const unsigned short*>(&Buffer[Offset]);
-	unsigned short ListLength = ntohs(*ListLengthBE);
-	Offset += sizeof(ListLength);
+	unsigned short ListLength = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
 
 	int SignedListLength = ListLength;
 
 	while (SignedListLength > 0)
 	{
-		Offset += 1;  // Skip type, its FFU - currently only host_name is supported.
-		const unsigned short* SrvNameLenBE = reinterpret_cast<const unsigned short*>(&Buffer[Offset]);
-		unsigned short SrvNameLen = ntohs(*SrvNameLenBE);
-		Offset += sizeof(SrvNameLen);
+		unsigned char sNameType = SerializationHelper::DeserializeUnsignedChar(Buffer, Offset);
+		unsigned short SrvNameLen = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
 
-		std::string ServerNameStr(&Buffer[Offset], &Buffer[Offset + SrvNameLen]);
+		std::string ServerNameStr = SerializationHelper::DeserializeString(Buffer, Offset, SrvNameLen);		
 		ServerNamesList.push_back(ServerNameStr);
 
-		Offset += SrvNameLen;
-		SignedListLength -= (1 + sizeof(SrvNameLen) + SrvNameLen);
+		SignedListLength -= (sizeof(sNameType) + sizeof(SrvNameLen) + SrvNameLen);
 	}
-
-	std::vector<char> buffy;
-	buffy.resize(1000);
-	size_t a = 0;
-	Serialize(buffy, a);
-
 
 }
