@@ -1,6 +1,7 @@
 #include <WinSock2.h>
 #include "TLS.h"
 #include "ServerNameExtension.h"
+#include "ClientHello.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -91,54 +92,61 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		case ExtensionType::server_name:
 			extensions.push_back(std::make_shared<ServerNameExtension>(Buffer, Offset));
 			break;
-		case ExtensionType::max_fragment_length:
-			break;
-		case ExtensionType::status_request:
-			break;
 		case ExtensionType::supported_groups:
-			break;
+		case ExtensionType::ec_points_format:
+		case ExtensionType::extended_master_secret:
+		case ExtensionType::renegotiation_info:
+		case ExtensionType::max_fragment_length:
+		//	break;
+		case ExtensionType::status_request:
+		//	break;
+		
+		//	break;
 		case ExtensionType::signature_algorithms:
-			break;
+		//	break;
 		case ExtensionType::use_srtp:
-			break;
+		//	break;
 		case ExtensionType::heartbeat:
-			break;
+		//	break;
 		case ExtensionType::application_layer_protocol_negotiation:
-			break;
+		//	break;
 		case ExtensionType::signed_certificate_timestamp:
-			break;
+		//	break;
 		case ExtensionType::client_certificate_type:
-			break;
+		//	break;
 		case ExtensionType::server_certificate_type:
-			break;
+		//	break;
 		case ExtensionType::padding:
-			break;
+		//	break;
 		case ExtensionType::pre_shared_key:
-			break;
+		//	break;
 		case ExtensionType::early_data:
-			break;
+			//break;
 		case ExtensionType::supported_versions:
-			break;
+		//	break;
 		case ExtensionType::cookie:
-			break;
+		//	break;
 		case ExtensionType::psk_key_exchange_modes:
-			break;
+		//	break;
 		case ExtensionType::certificate_authorities:
-			break;
+		//	break;
 		case ExtensionType::oid_filters:
-			break;
+			//break;
 		case ExtensionType::post_handshake_auth:
-			break;
+		//	break;
 		case ExtensionType::signature_algorithms_cert:
-			break;
+		//	break;
 		case ExtensionType::key_share:
-			break;
+		//	break;
 		case ExtensionType::compress_certificate:
+		//	break;
+		default:
+			Offset += ExtLength;
 			break;
 
 		}
 
-		Offset += ExtLength;
+		
 		ExtensionsLength -= (ExtLength + sizeof(ExtensionType) + sizeof(ExtLength));
 	}
 }

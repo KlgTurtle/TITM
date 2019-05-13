@@ -1,5 +1,6 @@
 #include "TLSState.h"
 #include <WinSock2.h>
+#include "ClientHello.h"
 TLSState::TLSState() 
 {
 	m_CurrentMessageBuffer.clear();

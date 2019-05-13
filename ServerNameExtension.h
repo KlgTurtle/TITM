@@ -6,5 +6,8 @@
 struct ServerNameExtension : public ITLSExtension
 {
 	ServerNameExtension(const std::vector<char>& Buffer, size_t& Offset);
+	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);
+	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+
 	std::vector<std::string> ServerNamesList;
 };

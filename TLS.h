@@ -26,14 +26,6 @@ struct TLSPlaintextHeader
 	unsigned short length;
 };
 
-//uint16 ProtocolVersion;
-//opaque Random[32];
-
-//uint8 CipherSuite[2];    /* Cryptographic suite selector */
-
-
-
-
 
 enum class HandshakeType : unsigned char
 {
@@ -64,23 +56,6 @@ struct ClientHelloHeader
 
 
 #pragma pack(pop)
-
-struct ITLSMessage
-{
-	TLSPlaintextHeader TLSHeader;
-	virtual std::string ToString();
-	virtual void Deserialize(const std::vector<char>& Buffer) = 0;
-	virtual void Serialize(std::vector<char>& Buffer) = 0;
-	
-};
-/*  struct {
-          ProtocolVersion legacy_version = 0x0303;  
-		  Random random;
-		  opaque legacy_session_id<0..32>;
-		  CipherSuite cipher_suites<2..2 ^ 16 - 2>;
-		  opaque legacy_compression_methods<1..2 ^ 8 - 1>;
-		  Extension extensions<8..2 ^ 16 - 1>;
-	  } ClientHello; */
 
 typedef struct {
 	int num;
@@ -431,27 +406,7 @@ static const ssl_trace_tbl ssl_ciphers_tbl[] = {
 
 
 
-struct ClientHello : public ITLSMessage
-{
-public:
-	ClientHello(const std::vector<char>& Buffer);
-	ProtocolVersion Version;
-	unsigned char random[32];
-	//unsigned char session_id_length;
-	std::vector<unsigned char> session_id;  // between 0 and 32 bytes
-	//unsigned short cipher_suites_length;
-	std::vector<unsigned short> cipher_suites;  // 2 elements min
-	//unsigned char compression_methods_length;
-	std::vector<unsigned char> compression_methods;
-	//unsigned short extensions_length;
-	std::vector<std::shared_ptr<ITLSExtension>>   extensions;
 
-	virtual std::string ToString();
-protected:
-	virtual void Deserialize(const std::vector<char>& Buffer);
-	virtual void Serialize(std::vector<char>& Buffer);
-	virtual void GetExtensions(const std::vector<char>& Buffer, size_t& Offset);
-} ;
 
 
 

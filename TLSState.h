@@ -1,5 +1,6 @@
 #pragma once
 #include "TLS.h"
+#include "ITLSMessage.h"
 #include <vector>
 #include <memory>
 class TLSState
