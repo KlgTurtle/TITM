@@ -51,7 +51,6 @@ struct ClientHelloHeader
 {
 	ProtocolVersion legacy_version;
 	unsigned char random[32];
-	unsigned char SessionIdLength;
 } ;
 
 

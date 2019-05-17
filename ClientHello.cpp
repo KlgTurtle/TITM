@@ -32,36 +32,9 @@ void ClientHello::Deserialize(const std::vector<char>& Buffer)
 
 	Offset += sizeof(ClientHelloHeader);
 
-	// Build ClientHello Session ID
-	this->session_id.clear();
-	this->session_id.insert(this->session_id.begin(), &Buffer[Offset],
-		&Buffer[Offset + CHHeader->SessionIdLength]);
-
-	Offset += CHHeader->SessionIdLength;
-
-	// Build CipherSuites
-	/*unsigned short CipherSuitesLength = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
-
-	for (size_t i = 0; i < CipherSuitesLength / sizeof(unsigned short); ++i)
-	{
-		unsigned short CipherSuite = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
-		this->cipher_suites.push_back(CipherSuite);
-	}*/
-
-	this->cipher_suites = SerializationHelper::DeserializeUShortVec(Buffer, Offset, sizeof(unsigned short));
-
-
-	unsigned char compression_methods_length = Buffer[Offset];
-	Offset += sizeof(compression_methods_length);
-	this->compression_methods.clear();
-	this->compression_methods.insert(this->compression_methods.begin(),
-		&Buffer[Offset], &Buffer[Offset + compression_methods_length]);
-
-	Offset += compression_methods_length;
-
-	// Build Extensions
-
-
+	this->session_id = SerializationHelper<unsigned char>::DeserializeVec<unsigned char>(Buffer, Offset);
+	this->cipher_suites = SerializationHelper<unsigned short>::DeserializeVec<unsigned short>(Buffer, Offset);
+	this->compression_methods = SerializationHelper<unsigned char>::DeserializeVec<unsigned char>(Buffer, Offset);
 
 	GetExtensions(Buffer, Offset);
 }

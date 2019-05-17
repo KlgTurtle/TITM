@@ -15,35 +15,31 @@ void ServerNameExtension::Serialize(std::vector<char>& Buffer, size_t & Offset)
 		ListLength += sName.length() + sizeof(unsigned short) + 1;
 	}
 
-	SerializationHelper::SerializeUnsignedShort(ListLength, Buffer, Offset);
+	SerializationHelper<unsigned short>::Serialize(ListLength, Buffer, Offset);
 
 	for each (const std::string& sName in ServerNamesList)
 	{
 		unsigned char sNameType = 0x00;
-		SerializationHelper::SerializeUnsignedChar(sNameType, Buffer, Offset);
-
-		unsigned short SrvNameLen = sName.length();
-		SerializationHelper::SerializeUnsignedShort(SrvNameLen, Buffer, Offset);	
-		SerializationHelper::SerializeString(sName, Buffer, Offset);
-
+		SerializationHelper<unsigned char>::Serialize(sNameType, Buffer, Offset);
+		SerializationHelper<unsigned char>::SerializeVec<unsigned short>(std::vector<unsigned char>(sName.begin(), sName.end()), 
+			Buffer, Offset);
 	}
 }
 
 void ServerNameExtension::Deserialize(const std::vector<char>& Buffer, size_t & Offset)
 {
-	unsigned short ListLength = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
+	unsigned short ListLength = SerializationHelper<unsigned short>::Deserialize(Buffer, Offset);
 
 	int SignedListLength = ListLength;
 
 	while (SignedListLength > 0)
 	{
-		unsigned char sNameType = SerializationHelper::DeserializeUnsignedChar(Buffer, Offset);
-		unsigned short SrvNameLen = SerializationHelper::DeserializeUnsignedShort(Buffer, Offset);
+		unsigned char sNameType = SerializationHelper<unsigned char>::Deserialize(Buffer, Offset);
 
-		std::string ServerNameStr = SerializationHelper::DeserializeString(Buffer, Offset, SrvNameLen);		
-		ServerNamesList.push_back(ServerNameStr);
-
-		SignedListLength -= (sizeof(sNameType) + sizeof(SrvNameLen) + SrvNameLen);
+		std::vector<unsigned char> ServerNameStr =
+			SerializationHelper<unsigned char>::DeserializeVec<unsigned short>(Buffer, Offset);
+		ServerNamesList.push_back(std::string(ServerNameStr.begin(), ServerNameStr.end()));
+		SignedListLength -= (sizeof(sNameType) + sizeof(unsigned short) + ServerNameStr.size());
 	}
 
 }
