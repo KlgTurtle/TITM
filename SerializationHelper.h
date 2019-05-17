@@ -2,85 +2,125 @@
 #include <vector>
 #include <string>
 #include <WinSock2.h>
-template <class FieldType>
+
+enum class UCharLength : unsigned char {};
+enum class UShortLength : unsigned short {};
+enum class UCharType : unsigned char {};
+template<typename E>
+constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
+{
+	return static_cast<typename std::underlying_type<E>::type>(e);
+}
+
 class SerializationHelper
 {
 public:
+	template <class FieldType>
 	static FieldType Deserialize(const std::vector<char>& Buffer, size_t& Offset)
 	{
-		const FieldType* FieldBE = reinterpret_cast<const FieldType*>(&Buffer[Offset]);
-		FieldType Field;
-		switch (sizeof(FieldType))
-		{
-			case sizeof(unsigned char) :
-				Field = *FieldBE;
-				break;
-			case sizeof(unsigned short) :
-				Field = ntohs(*FieldBE);
-				break;
-			case sizeof(unsigned int) :
-				Field = ntohl(*FieldBE);
-				break;
-			case sizeof(unsigned __int64) :
-				Field = ntohll(*FieldBE);
-				break;
-			default:
-				break;
-		}
+		const auto* FieldBE = 
+			reinterpret_cast<const std::underlying_type<FieldType>::type*>(&Buffer[Offset]);
+		std::underlying_type<FieldType>::type Field;
+		Field = Deserialize<std::underlying_type<FieldType>::type>(Buffer, Offset);
 		
-		Offset += sizeof(FieldType);
+		return static_cast<FieldType>(Field);
+	}
 
+	template <>
+	static unsigned char Deserialize<unsigned char>(const std::vector<char>& Buffer, size_t& Offset)
+	{
+		unsigned char Field = Buffer[Offset];
+		Offset += sizeof(Field);
 		return Field;
 	}
 
+	template <>
+	static unsigned short Deserialize<unsigned short>(const std::vector<char>& Buffer, size_t& Offset)
+	{
+		const unsigned short* FieldBE = reinterpret_cast<const unsigned short*>(&Buffer[Offset]);
+		unsigned short Field = ntohs(*FieldBE);
+		Offset += sizeof(Field);
+		return Field;
+	}
+
+	template <>
+	static unsigned int Deserialize<unsigned int>(const std::vector<char>& Buffer, size_t& Offset)
+	{
+		const unsigned int* FieldBE = reinterpret_cast<const unsigned int*>(&Buffer[Offset]);
+		unsigned int Field = ntohl(*FieldBE);
+		Offset += sizeof(Field);
+		return Field;
+	}
+
+	template <>
+	static unsigned __int64 Deserialize<unsigned __int64>(const std::vector<char>& Buffer, size_t& Offset)
+	{
+		const unsigned __int64* FieldBE = reinterpret_cast<const unsigned __int64*>(&Buffer[Offset]);
+		unsigned __int64 Field = ntohll(*FieldBE);
+		Offset += sizeof(Field);
+		return Field;
+	}
+
+	template <class FieldType>
 	static void Serialize(FieldType Field, std::vector<char>& Buffer, size_t& Offset)
 	{
-		FieldType FieldBE;
-		switch (sizeof(FieldType))
-		{
-		case sizeof(unsigned char) :
-			FieldBE = Field;
-			break;
-		case sizeof(unsigned short) :
-			FieldBE = htons(Field);
-			break;
-		case sizeof(unsigned int) :
-			FieldBE = htonl(Field);
-			break;
-		case sizeof(unsigned __int64) :
-			FieldBE = htonll(Field);
-			break;
-		default:
-			break;
-		}
-		
+		auto FieldToSerialize = to_integral(Field);
+		Serialize<typename std::underlying_type<FieldType>::type>(FieldToSerialize, Buffer, Offset);
+	}
+
+	template <>
+	static void Serialize<unsigned char>(unsigned char Field, std::vector<char>& Buffer, size_t& Offset)
+	{
+		Buffer[Offset] = Field;
+		Offset += sizeof(Field);
+	}
+
+	template <>
+	static void Serialize<unsigned short>(unsigned short Field, std::vector<char>& Buffer, size_t& Offset)
+	{
+		const unsigned short FieldBE = htons(Field);
 		memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
-		Offset += sizeof(FieldBE);
+		Offset += sizeof(Field);
+	}
+
+	template <>
+	static void Serialize<unsigned int>(unsigned int Field, std::vector<char>& Buffer, size_t& Offset)
+	{
+		const unsigned int FieldBE = htonl(Field);
+		memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		Offset += sizeof(Field);
+	}
+
+	template <>
+	static void Serialize<unsigned __int64>(unsigned __int64 Field, std::vector<char>& Buffer, size_t& Offset)
+	{
+		const unsigned __int64 FieldBE = htonll(Field);
+		memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		Offset += sizeof(Field);
 	}
 	
-	template <class LengthType>
-	static std::vector<FieldType> DeserializeVec(const std::vector<char>& Buffer, size_t& Offset)
+	template <class FieldType, class LengthType>
+	static void DeserializeVec(const std::vector<char>& Buffer, size_t& Offset, std::vector<FieldType>& OutVec)
 	{
-		std::vector<FieldType> Result;
-		size_t VecSize = SerializationHelper<LengthType>::Deserialize(Buffer, Offset);
-		
+		OutVec.clear();
+		LengthType VecSize = Deserialize<LengthType>(Buffer, Offset);
+
 		for (size_t i = 0; i < VecSize / sizeof(FieldType); ++i)
 		{
-			FieldType Field = Deserialize(Buffer, Offset);
-			Result.push_back(Field);
+			FieldType Field = Deserialize<FieldType>(Buffer, Offset);
+			OutVec.push_back(Field);
 		}
-
-		return Result;
 	}
 
-	template <class LengthType>
+	template <class FieldType, class LengthType>
 	static void SerializeVec(const std::vector<FieldType> Vec, std::vector<char>& Buffer, size_t& Offset)
 	{
-		Serialize(static_cast<LengthType>(Vec.size()), Buffer, Offset);
+		LengthType VecSize = static_cast<LengthType>(Vec.size());
+		Serialize<LengthType>(VecSize, Buffer, Offset);
 
 		for (size_t i = 0; i < Vec.size(); ++i)
 		{
-			Serialize(Vec[i], Buffer, Offset);
+			Serialize<FieldType>(Vec[i], Buffer, Offset);
 		}
 	}
 };
@@ -102,3 +142,4 @@ public:
 //		                           size_t& Offset);
 //
 //};
+

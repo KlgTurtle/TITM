@@ -5,6 +5,7 @@
 #include "ClientHello.h"
 #include "SerializationHelper.h"
 #include "ClientSupportedVersions.h"
+#include "ECPointFormats.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -32,9 +33,9 @@ void ClientHello::Deserialize(const std::vector<char>& Buffer)
 
 	Offset += sizeof(ClientHelloHeader);
 
-	this->session_id = SerializationHelper<unsigned char>::DeserializeVec<unsigned char>(Buffer, Offset);
-	this->cipher_suites = SerializationHelper<unsigned short>::DeserializeVec<unsigned short>(Buffer, Offset);
-	this->compression_methods = SerializationHelper<unsigned char>::DeserializeVec<unsigned char>(Buffer, Offset);
+	SerializationHelper::DeserializeVec<unsigned char, unsigned char>(Buffer, Offset, this->session_id);
+	SerializationHelper::DeserializeVec<unsigned short, unsigned short>(Buffer, Offset, this->cipher_suites);
+	SerializationHelper::DeserializeVec<unsigned char, unsigned char>(Buffer, Offset, this->compression_methods);
 
 	GetExtensions(Buffer, Offset);
 }
@@ -72,6 +73,8 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 			extensions.push_back(std::make_shared<ClientSupportedVersions>(Buffer, Offset));
 			break;
 		case ExtensionType::ec_points_format:
+			extensions.push_back(std::make_shared<ECPointFormats>(Buffer, Offset));
+			break;
 		case ExtensionType::extended_master_secret:
 		case ExtensionType::renegotiation_info:
 		case ExtensionType::max_fragment_length:

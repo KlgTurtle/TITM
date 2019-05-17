@@ -69,6 +69,9 @@
     <ClCompile Include="ClientSupportedVersions.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="ECPointFormats.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -123,6 +126,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ClientSupportedVersions.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ECPointFormats.h">
       <Filter>Extensions</Filter>
     </ClInclude>
   </ItemGroup>

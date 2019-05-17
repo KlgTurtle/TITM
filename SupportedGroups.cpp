@@ -8,11 +8,11 @@ SupportedGroups::SupportedGroups(const std::vector<char>& Buffer, size_t & Offse
 
 void SupportedGroups::Serialize(std::vector<char>& Buffer, size_t & Offset)
 {
-	SerializationHelper<unsigned short>::SerializeVec<unsigned short>(SupportedGroupsList, Buffer, Offset);
+	SerializationHelper::SerializeVec<NamedCurve, unsigned short>(SupportedGroupsList, Buffer, Offset);
 }
 
 void SupportedGroups::Deserialize(const std::vector<char>& Buffer, size_t & Offset)
 {
-	SupportedGroupsList = SerializationHelper<unsigned short>::DeserializeVec<unsigned short>(Buffer, Offset);
+    SerializationHelper::DeserializeVec<NamedCurve, unsigned short>(Buffer, Offset, SupportedGroupsList);
 }
 

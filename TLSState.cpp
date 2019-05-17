@@ -8,29 +8,13 @@ TLSState::TLSState()
 
 std::shared_ptr<ITLSMessage> TLSState::Update(const std::vector<char>& DataBuffer)
 {
-
-
 	std::shared_ptr<ITLSMessage> ReturnMsg = nullptr;
-
-	/*if (m_CurrentMessageBuffer.size() < sizeof(TLSPlaintextHeader))
-	{
-		m_CurrentMessageBuffer.insert(m_CurrentMessageBuffer.end(), DataBuffer.begin(), DataBuffer.end());
-		if (m_CurrentMessageBuffer.size() >= sizeof(TLSPlaintextHeader))
-		{
-			std::copy(reinterpret_cast<char*>(&m_CurrentHeader), m_CurrentMessageBuffer.data(), 
-				sizeof(TLSPlaintextHeader));
-		}
-
-
-	}*/
 
 	m_CurrentMessageBuffer.insert(m_CurrentMessageBuffer.end(), DataBuffer.begin(), DataBuffer.end());
 
 	// If we have a header and also a buffered message with the number specified in the header or more
 	// it means we can parse a full message now.
 	if (m_CurrentMessageBuffer.size() >= sizeof(TLSPlaintextHeader)) 
-		//&&
-	//	m_CurrentMessageBuffer.size() >= m_CurrentHeader.length + sizeof(TLSPlaintextHeader))
 	{
 		TLSPlaintextHeader* CurrentHeader = reinterpret_cast<TLSPlaintextHeader*>(m_CurrentMessageBuffer.data());
 		unsigned short CurrHeaderLength = ntohs(CurrentHeader->length);
@@ -50,15 +34,9 @@ std::shared_ptr<ITLSMessage> TLSState::Update(const std::vector<char>& DataBuffe
 			case ContentType::alert:
 				ReturnMsg = GetAlertMsg();
 				break;
-			}
-
-			
+			}	
 		}
 	}
-
-	
-
-
 
 	return ReturnMsg;
 }
@@ -77,9 +55,7 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 	memcpy(&HSHeaderLengthBuf[1], HSHeader->length, sizeof(HSHeader->length));
 	
 	unsigned int HSHeaderLength = ntohl(*reinterpret_cast<unsigned long*>(HSHeaderLengthBuf.data()));
-	//m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(),
-	//	m_CurrentMessageBuffer.begin() + CurrentHeader->length + sizeof(TLSPlaintextHeader));
-
+	
 	// Only proceed if we have the full handshake message. Otherwise wait for more bytes.
 	// Note that this is because according to the RFC, a TLS message of any type (Handshake/Alert/Application/CCS)
 	// MAY be split across several record layer messages!
@@ -95,7 +71,6 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 		break;
 	case HandshakeType::client_hello:
 		RetTLSMessage = std::make_shared<ClientHello>(m_CurrentMessageBuffer);
-		//RetTLSMessage->Deserialize(m_CurrentMessageBuffer);
 		break;
 	case HandshakeType::server_hello:
 		break;
@@ -117,7 +92,7 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 		break;
 	}
 
-	return nullptr;
+	return RetTLSMessage;
 }
 
 std::shared_ptr<ITLSMessage> TLSState::GetChangeCipherSpecMsg()
