@@ -6,6 +6,9 @@
 #include "SerializationHelper.h"
 #include "ClientSupportedVersions.h"
 #include "ECPointFormats.h"
+#include "AppLayerProtocolNegotiation.h"
+#include "StatusRequest.h"
+#include "SignatureHashAlgorithms.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -75,21 +78,30 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		case ExtensionType::ec_points_format:
 			extensions.push_back(std::make_shared<ECPointFormats>(Buffer, Offset));
 			break;
+		case ExtensionType::application_layer_protocol_negotiation:
+			extensions.push_back(std::make_shared<AppLayerProtocolNegotiation>(Buffer, Offset));
+			break;
+		case ExtensionType::status_request:
+			extensions.push_back(std::make_shared<StatusRequest>(Buffer, Offset));
+			break;
+		case ExtensionType::signature_algorithms:
+			extensions.push_back(std::make_shared<SignatureHashAlgorithms>(Buffer, Offset));
+			break;
 		case ExtensionType::extended_master_secret:
 		case ExtensionType::renegotiation_info:
 		case ExtensionType::max_fragment_length:
 		//	break;
-		case ExtensionType::status_request:
+		
 		//	break;
 		
 		//	break;
-		case ExtensionType::signature_algorithms:
+		
 		//	break;
 		case ExtensionType::use_srtp:
 		//	break;
 		case ExtensionType::heartbeat:
 		//	break;
-		case ExtensionType::application_layer_protocol_negotiation:
+		
 		//	break;
 		case ExtensionType::signed_certificate_timestamp:
 		//	break;

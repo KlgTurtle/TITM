@@ -72,6 +72,15 @@
     <ClCompile Include="ECPointFormats.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="AppLayerProtocolNegotiation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusRequest.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="SignatureHashAlgorithms.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -129,6 +138,15 @@
       <Filter>Extensions</Filter>
     </ClInclude>
     <ClInclude Include="ECPointFormats.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="AppLayerProtocolNegotiation.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusRequest.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="SignatureHashAlgorithms.h">
       <Filter>Extensions</Filter>
     </ClInclude>
   </ItemGroup>

@@ -142,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppLayerProtocolNegotiation.cpp" />
     <ClCompile Include="ClientHello.cpp" />
     <ClCompile Include="ECPointFormats.cpp" />
     <ClCompile Include="HexPrinter.cpp" />
@@ -149,6 +150,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SerializationHelper.cpp" />
     <ClCompile Include="ServerNameExtension.cpp" />
+    <ClCompile Include="SignatureHashAlgorithms.cpp" />
+    <ClCompile Include="StatusRequest.cpp" />
     <ClCompile Include="SupportedGroups.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
     </ClCompile>
@@ -163,6 +166,7 @@
     <ClCompile Include="TLSState.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppLayerProtocolNegotiation.h" />
     <ClInclude Include="ClientHello.h" />
     <ClInclude Include="ECPointFormats.h" />
     <ClInclude Include="HexPrinter.h" />
@@ -171,6 +175,8 @@
     <ClInclude Include="ITLSMessage.h" />
     <ClInclude Include="SerializationHelper.h" />
     <ClInclude Include="ServerNameExtension.h" />
+    <ClInclude Include="SignatureHashAlgorithms.h" />
+    <ClInclude Include="StatusRequest.h" />
     <ClInclude Include="SupportedGroups.h" />
     <ClInclude Include="ClientSupportedVersions.h" />
     <ClInclude Include="TcpClientSocket.h" />
