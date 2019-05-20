@@ -144,13 +144,14 @@
   <ItemGroup>
     <ClCompile Include="AppLayerProtocolNegotiation.cpp" />
     <ClCompile Include="ClientHello.cpp" />
+    <ClCompile Include="CompressCertificate.cpp" />
     <ClCompile Include="ECPointFormats.cpp" />
     <ClCompile Include="HexPrinter.cpp" />
     <ClCompile Include="ITcpProxyManipulator.cpp" />
     <ClCompile Include="KeyShare.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Padding.cpp" />
     <ClCompile Include="PskKeyExchangeModes.cpp" />
-    <ClCompile Include="SerializationHelper.cpp" />
     <ClCompile Include="ServerNameExtension.cpp" />
     <ClCompile Include="SignatureHashAlgorithms.cpp" />
     <ClCompile Include="StatusRequest.cpp" />
@@ -170,6 +171,7 @@
   <ItemGroup>
     <ClInclude Include="AppLayerProtocolNegotiation.h" />
     <ClInclude Include="ClientHello.h" />
+    <ClInclude Include="CompressCertificate.h" />
     <ClInclude Include="ECPointFormats.h" />
     <ClInclude Include="HexPrinter.h" />
     <ClInclude Include="ITcpProxyManipulator.h" />
@@ -177,6 +179,7 @@
     <ClInclude Include="ITLSMessage.h" />
     <ClInclude Include="KeyShare.h" />
     <ClInclude Include="NamedGroups.h" />
+    <ClInclude Include="Padding.h" />
     <ClInclude Include="PskKeyExchangeModes.h" />
     <ClInclude Include="SerializationHelper.h" />
     <ClInclude Include="ServerNameExtension.h" />

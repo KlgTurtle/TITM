@@ -11,6 +11,8 @@
 #include "SignatureHashAlgorithms.h"
 #include "KeyShare.h"
 #include "PskKeyExchangeModes.h"
+#include "CompressCertificate.h"
+#include "Padding.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -95,46 +97,28 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		case ExtensionType::psk_key_exchange_modes:
 			extensions.push_back(std::make_shared<PskKeyExchangeModes>(Buffer, Offset));
 			break;
+		case ExtensionType::compress_certificate:
+			extensions.push_back(std::make_shared<CompressCertificate>(Buffer, Offset));
+			break;
+		case ExtensionType::padding:
+			extensions.push_back(std::make_shared<Padding>(Buffer, Offset, ExtLength));
+			break;
+
 		case ExtensionType::extended_master_secret:
 		case ExtensionType::renegotiation_info:
 		case ExtensionType::max_fragment_length:
-	
 		case ExtensionType::use_srtp:
-		//	break;
 		case ExtensionType::heartbeat:
-		//	break;
-		
-		//	break;
 		case ExtensionType::signed_certificate_timestamp:
-		//	break;
 		case ExtensionType::client_certificate_type:
-		//	break;
 		case ExtensionType::server_certificate_type:
-		//	break;
-		case ExtensionType::padding:
-		//	break;
 		case ExtensionType::pre_shared_key:
-		//	break;
 		case ExtensionType::early_data:
-			//break;
-		
-		//	break;
 		case ExtensionType::cookie:
-		//	break;
-		
-		//	break;
 		case ExtensionType::certificate_authorities:
-		//	break;
 		case ExtensionType::oid_filters:
-			//break;
 		case ExtensionType::post_handshake_auth:
-		//	break;
 		case ExtensionType::signature_algorithms_cert:
-		//	break;
-		
-		//	break;
-		case ExtensionType::compress_certificate:
-		//	break;
 		default:
 			Offset += ExtLength;
 			break;

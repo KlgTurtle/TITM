@@ -35,6 +35,14 @@ public:
 	}
 
 	template <>
+	static char Deserialize<char>(const std::vector<char>& Buffer, size_t& Offset)
+	{
+		char Field = Buffer[Offset];
+		Offset += sizeof(Field);
+		return Field;
+	}
+
+	template <>
 	static unsigned short Deserialize<unsigned short>(const std::vector<char>& Buffer, size_t& Offset)
 	{
 		const unsigned short* FieldBE = reinterpret_cast<const unsigned short*>(&Buffer[Offset]);
@@ -71,31 +79,58 @@ public:
 	template <>
 	static void Serialize<unsigned char>(unsigned char Field, std::vector<char>& Buffer, size_t& Offset)
 	{
-		Buffer[Offset] = Field;
+		// size()==0 means we just want to get the updated offset back.
+		if (Buffer.size() > 0)
+		{
+			Buffer[Offset] = Field;
+		}
+		Offset += sizeof(Field);
+	}
+
+	template <>
+	static void Serialize<char>(char Field, std::vector<char>& Buffer, size_t& Offset)
+	{
+		// size()==0 means we just want to get the updated offset back.
+		if (Buffer.size() > 0)
+		{
+			Buffer[Offset] = Field;
+		}
 		Offset += sizeof(Field);
 	}
 
 	template <>
 	static void Serialize<unsigned short>(unsigned short Field, std::vector<char>& Buffer, size_t& Offset)
 	{
-		const unsigned short FieldBE = htons(Field);
-		memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		// size()==0 means we just want to get the updated offset back.
+		if (Buffer.size() > 0)
+		{
+			const unsigned short FieldBE = htons(Field);
+			memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		}
 		Offset += sizeof(Field);
 	}
 
 	template <>
 	static void Serialize<unsigned int>(unsigned int Field, std::vector<char>& Buffer, size_t& Offset)
 	{
-		const unsigned int FieldBE = htonl(Field);
-		memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		// size()==0 means we just want to get the updated offset back.
+		if (Buffer.size() > 0)
+		{
+			const unsigned int FieldBE = htonl(Field);
+			memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		}
 		Offset += sizeof(Field);
 	}
 
 	template <>
 	static void Serialize<unsigned __int64>(unsigned __int64 Field, std::vector<char>& Buffer, size_t& Offset)
 	{
-		const unsigned __int64 FieldBE = htonll(Field);
-		memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		// size()==0 means we just want to get the updated offset back.
+		if (Buffer.size() > 0)
+		{
+			const unsigned __int64 FieldBE = htonll(Field);
+			memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
+		}
 		Offset += sizeof(Field);
 	}
 	
@@ -112,13 +147,34 @@ public:
 		}
 	}
 
+	template <class FieldType>
+	static void DeserializeFixedVec(const std::vector<char>& Buffer, size_t& Offset, std::vector<FieldType>& OutVec, size_t VecSize)
+	{
+		OutVec.clear();
+
+		for (size_t i = 0; i < VecSize; ++i)
+		{
+			FieldType Field = Deserialize<FieldType>(Buffer, Offset);
+			OutVec.push_back(Field);
+		}
+	}
+
 	template <class FieldType, class LengthType>
-	static void SerializeVec(const std::vector<FieldType> Vec, std::vector<char>& Buffer, size_t& Offset)
+	static void SerializeVec(const std::vector<FieldType>& Vec, std::vector<char>& Buffer, size_t& Offset)
 	{
 		LengthType VecSize = static_cast<LengthType>(Vec.size());
 		Serialize<LengthType>(VecSize, Buffer, Offset);
 
 		for (size_t i = 0; i < Vec.size(); ++i)
+		{
+			Serialize<FieldType>(Vec[i], Buffer, Offset);
+		}
+	}
+
+	template <class FieldType>
+	static void SerializeFixedVec(const std::vector<FieldType>& Vec, size_t VecSize, std::vector<char>& Buffer, size_t& Offset)
+	{
+		for (size_t i = 0; i < VecSize; ++i)
 		{
 			Serialize<FieldType>(Vec[i], Buffer, Offset);
 		}
