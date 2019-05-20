@@ -81,6 +81,12 @@
     <ClCompile Include="SignatureHashAlgorithms.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="KeyShare.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="PskKeyExchangeModes.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -147,6 +153,15 @@
       <Filter>Extensions</Filter>
     </ClInclude>
     <ClInclude Include="SignatureHashAlgorithms.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="NamedGroups.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyShare.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="PskKeyExchangeModes.h">
       <Filter>Extensions</Filter>
     </ClInclude>
   </ItemGroup>

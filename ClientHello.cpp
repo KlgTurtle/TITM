@@ -9,6 +9,8 @@
 #include "AppLayerProtocolNegotiation.h"
 #include "StatusRequest.h"
 #include "SignatureHashAlgorithms.h"
+#include "KeyShare.h"
+#include "PskKeyExchangeModes.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -87,16 +89,16 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		case ExtensionType::signature_algorithms:
 			extensions.push_back(std::make_shared<SignatureHashAlgorithms>(Buffer, Offset));
 			break;
+		case ExtensionType::key_share:
+			extensions.push_back(std::make_shared<KeyShare>(Buffer, Offset));
+			break;
+		case ExtensionType::psk_key_exchange_modes:
+			extensions.push_back(std::make_shared<PskKeyExchangeModes>(Buffer, Offset));
+			break;
 		case ExtensionType::extended_master_secret:
 		case ExtensionType::renegotiation_info:
 		case ExtensionType::max_fragment_length:
-		//	break;
-		
-		//	break;
-		
-		//	break;
-		
-		//	break;
+	
 		case ExtensionType::use_srtp:
 		//	break;
 		case ExtensionType::heartbeat:
@@ -119,7 +121,7 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		//	break;
 		case ExtensionType::cookie:
 		//	break;
-		case ExtensionType::psk_key_exchange_modes:
+		
 		//	break;
 		case ExtensionType::certificate_authorities:
 		//	break;
@@ -129,7 +131,7 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		//	break;
 		case ExtensionType::signature_algorithms_cert:
 		//	break;
-		case ExtensionType::key_share:
+		
 		//	break;
 		case ExtensionType::compress_certificate:
 		//	break;

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "SerializationHelper.h"
 
 enum class ExtensionType : unsigned short
 {
