@@ -96,6 +96,18 @@
     <ClCompile Include="ExtendedMasterSecret.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="RenegotiationInfo.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionTicket.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="SignedCertificateTimestamp.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="UnknownExtension.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -183,6 +195,18 @@
       <Filter>Extensions</Filter>
     </ClInclude>
     <ClInclude Include="ExtendedMasterSecret.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="RenegotiationInfo.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionTicket.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="SignedCertificateTimestamp.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="UnknownExtension.h">
       <Filter>Extensions</Filter>
     </ClInclude>
   </ItemGroup>

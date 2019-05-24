@@ -15,6 +15,10 @@
 #include "Padding.h"
 #include "ReservedGREASE.h"
 #include "ExtendedMasterSecret.h"
+#include "RenegotiationInfo.h"
+#include "SessionTicket.h"
+#include "SignedCertificateTimestamp.h"
+#include "UnknownExtension.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -108,6 +112,15 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		case ExtensionType::extended_master_secret:
 			extensions.push_back(std::make_shared<ExtendedMasterSecret>(Buffer, Offset, ExtLength, bIsExtEmpty));
 			break;
+		case ExtensionType::renegotiation_info:
+			extensions.push_back(std::make_shared<RenegotiationInfo>(Buffer, Offset, bIsExtEmpty));
+			break;
+		case ExtensionType::session_ticket:
+			extensions.push_back(std::make_shared<SessionTicket>(Buffer, Offset, ExtLength, bIsExtEmpty));
+			break;
+		case ExtensionType::signed_certificate_timestamp:
+			extensions.push_back(std::make_shared<SignedCertificateTimestamp>(Buffer, Offset, ExtLength, bIsExtEmpty));
+			break;
 		case ExtensionType::GREASE_Reserved1:
 		case ExtensionType::GREASE_Reserved2:
 		case ExtensionType::GREASE_Reserved3:
@@ -126,11 +139,9 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		case ExtensionType::GREASE_Reserved16:
 			extensions.push_back(std::make_shared<ReservedGREASE>(Buffer, Offset, ExtType, ExtLength, bIsExtEmpty));
 			break;
-		case ExtensionType::renegotiation_info:
 		case ExtensionType::max_fragment_length:
 		case ExtensionType::use_srtp:
 		case ExtensionType::heartbeat:
-		case ExtensionType::signed_certificate_timestamp:
 		case ExtensionType::client_certificate_type:
 		case ExtensionType::server_certificate_type:
 		case ExtensionType::pre_shared_key:
@@ -141,7 +152,7 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		case ExtensionType::post_handshake_auth:
 		case ExtensionType::signature_algorithms_cert:
 		default:
-			Offset += ExtLength;
+			extensions.push_back(std::make_shared<UnknownExtension>(Buffer, Offset, ExtType, ExtLength, bIsExtEmpty));
 			break;
 
 		}
@@ -154,4 +165,5 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 
 void ClientHello::Serialize(std::vector<char>& Buffer)
 {
+
 }

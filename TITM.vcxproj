@@ -153,9 +153,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="PskKeyExchangeModes.cpp" />
+    <ClCompile Include="RenegotiationInfo.cpp" />
     <ClCompile Include="ReservedGREASE.cpp" />
     <ClCompile Include="ServerNameExtension.cpp" />
+    <ClCompile Include="SessionTicket.cpp" />
     <ClCompile Include="SignatureHashAlgorithms.cpp" />
+    <ClCompile Include="SignedCertificateTimestamp.cpp" />
     <ClCompile Include="StatusRequest.cpp" />
     <ClCompile Include="SupportedGroups.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
@@ -169,6 +172,7 @@
     <ClCompile Include="TcpSocketSelector.cpp" />
     <ClCompile Include="TLS.cpp" />
     <ClCompile Include="TLSState.cpp" />
+    <ClCompile Include="UnknownExtension.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppLayerProtocolNegotiation.h" />
@@ -184,10 +188,13 @@
     <ClInclude Include="NamedGroups.h" />
     <ClInclude Include="Padding.h" />
     <ClInclude Include="PskKeyExchangeModes.h" />
+    <ClInclude Include="RenegotiationInfo.h" />
     <ClInclude Include="ReservedGREASE.h" />
     <ClInclude Include="SerializationHelper.h" />
     <ClInclude Include="ServerNameExtension.h" />
+    <ClInclude Include="SessionTicket.h" />
     <ClInclude Include="SignatureHashAlgorithms.h" />
+    <ClInclude Include="SignedCertificateTimestamp.h" />
     <ClInclude Include="StatusRequest.h" />
     <ClInclude Include="SupportedGroups.h" />
     <ClInclude Include="ClientSupportedVersions.h" />
@@ -200,6 +207,7 @@
     <ClInclude Include="TITMParms.h" />
     <ClInclude Include="TLS.h" />
     <ClInclude Include="TLSState.h" />
+    <ClInclude Include="UnknownExtension.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
