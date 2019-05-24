@@ -38,9 +38,10 @@ enum class SignatureScheme : unsigned short
 
 struct SignatureHashAlgorithms : public ITLSExtension
 {
-	SignatureHashAlgorithms(const std::vector<char>& Buffer, size_t& Offset);
+	SignatureHashAlgorithms(const std::vector<char>& Buffer, size_t& Offset, bool bIsEmpty);
 	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+	virtual ExtensionType GetType() { return ExtensionType::signature_algorithms; }
 
 	std::vector<SignatureScheme> SignatureSchemeList;
 };

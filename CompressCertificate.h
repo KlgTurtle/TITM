@@ -11,9 +11,10 @@ enum class CertificateCompressionAlgorithm : unsigned short
 
 struct CompressCertificate : public ITLSExtension
 {
-	CompressCertificate(const std::vector<char>& Buffer, size_t& Offset);
+	CompressCertificate(const std::vector<char>& Buffer, size_t& Offset, bool bIsEmpty);
 	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+	virtual ExtensionType GetType() { return ExtensionType::compress_certificate; }
 
 	std::vector<CertificateCompressionAlgorithm> CompressionAlgorithmList;
 };

@@ -12,9 +12,10 @@ enum class PskKeyExchangeMode : unsigned char
 
 struct PskKeyExchangeModes : public ITLSExtension
 {
-	PskKeyExchangeModes(const std::vector<char>& Buffer, size_t& Offset);
+	PskKeyExchangeModes(const std::vector<char>& Buffer, size_t& Offset, bool bIsEmpty);
 	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+	virtual ExtensionType GetType() { return ExtensionType::psk_key_exchange_modes; }
 
 	std::vector<PskKeyExchangeMode> PskKeyExchangeModesList;
 };

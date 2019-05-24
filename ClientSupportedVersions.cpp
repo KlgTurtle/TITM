@@ -1,9 +1,12 @@
 #include "ClientSupportedVersions.h"
 #include "SerializationHelper.h"
 
-ClientSupportedVersions::ClientSupportedVersions(const std::vector<char>& Buffer, size_t & Offset)
+ClientSupportedVersions::ClientSupportedVersions(const std::vector<char>& Buffer, size_t & Offset, bool bIsEmpty)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void ClientSupportedVersions::Serialize(std::vector<char>& Buffer, size_t & Offset)

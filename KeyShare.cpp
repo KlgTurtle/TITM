@@ -1,9 +1,12 @@
 #include "KeyShare.h"
 #include "SerializationHelper.h"
 
-KeyShare::KeyShare(const std::vector<char>& Buffer, size_t & Offset)
+KeyShare::KeyShare(const std::vector<char>& Buffer, size_t & Offset, bool bIsEmpty)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void KeyShare::Serialize(std::vector<char>& Buffer, size_t & Offset)

@@ -1,8 +1,11 @@
 #include "CompressCertificate.h"
 
-CompressCertificate::CompressCertificate(const std::vector<char>& Buffer, size_t & Offset)
+CompressCertificate::CompressCertificate(const std::vector<char>& Buffer, size_t & Offset, bool bIsEmpty)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void CompressCertificate::Serialize(std::vector<char>& Buffer, size_t & Offset)

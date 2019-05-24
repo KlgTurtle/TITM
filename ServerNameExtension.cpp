@@ -2,9 +2,12 @@
 #include "ServerNameExtension.h"
 #include "SerializationHelper.h"
 
-ServerNameExtension::ServerNameExtension(const std::vector<char>& Buffer, size_t & Offset)
+ServerNameExtension::ServerNameExtension(const std::vector<char>& Buffer, size_t & Offset, bool bIsEmpty)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void ServerNameExtension::Serialize(std::vector<char>& Buffer, size_t & Offset)

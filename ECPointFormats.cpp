@@ -1,9 +1,12 @@
 #include "ECPointFormats.h"
 #include "SerializationHelper.h"
 
-ECPointFormats::ECPointFormats(const std::vector<char>& Buffer, size_t & Offset)
+ECPointFormats::ECPointFormats(const std::vector<char>& Buffer, size_t & Offset, bool bIsEmpty)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void ECPointFormats::Serialize(std::vector<char>& Buffer, size_t & Offset)

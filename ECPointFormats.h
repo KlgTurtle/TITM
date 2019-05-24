@@ -12,9 +12,10 @@ enum class ECPointFormat : unsigned char
 
 struct ECPointFormats : public ITLSExtension
 {
-	ECPointFormats(const std::vector<char>& Buffer, size_t& Offset);
+	ECPointFormats(const std::vector<char>& Buffer, size_t& Offset, bool bIsEmpty);
 	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+	virtual ExtensionType GetType() { return ExtensionType::ec_points_format; }
 
 	std::vector<ECPointFormat> ECPointFormatList;
 };

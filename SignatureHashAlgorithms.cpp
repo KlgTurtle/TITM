@@ -1,9 +1,12 @@
 #include "SignatureHashAlgorithms.h"
 #include "SerializationHelper.h"
 
-SignatureHashAlgorithms::SignatureHashAlgorithms(const std::vector<char>& Buffer, size_t & Offset)
+SignatureHashAlgorithms::SignatureHashAlgorithms(const std::vector<char>& Buffer, size_t & Offset, bool bIsEmpty)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void SignatureHashAlgorithms::Serialize(std::vector<char>& Buffer, size_t & Offset)

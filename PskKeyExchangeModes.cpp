@@ -1,8 +1,11 @@
 #include "PskKeyExchangeModes.h"
 
-PskKeyExchangeModes::PskKeyExchangeModes(const std::vector<char>& Buffer, size_t & Offset)
+PskKeyExchangeModes::PskKeyExchangeModes(const std::vector<char>& Buffer, size_t & Offset, bool bIsEmpty)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void PskKeyExchangeModes::Serialize(std::vector<char>& Buffer, size_t & Offset)

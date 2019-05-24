@@ -90,6 +90,12 @@
     <ClCompile Include="Padding.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="ReservedGREASE.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtendedMasterSecret.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -171,6 +177,12 @@
       <Filter>Extensions</Filter>
     </ClInclude>
     <ClInclude Include="Padding.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ReservedGREASE.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtendedMasterSecret.h">
       <Filter>Extensions</Filter>
     </ClInclude>
   </ItemGroup>

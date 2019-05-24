@@ -13,6 +13,8 @@
 #include "PskKeyExchangeModes.h"
 #include "CompressCertificate.h"
 #include "Padding.h"
+#include "ReservedGREASE.h"
+#include "ExtendedMasterSecret.h"
 
 ClientHello::ClientHello(const std::vector<char>& Buffer)
 {
@@ -65,46 +67,65 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 		const unsigned short* ExtLengthBE = reinterpret_cast<const unsigned short*>(&Buffer[Offset]);
 		unsigned short ExtLength = ntohs(*ExtLengthBE);
 		Offset += sizeof(ExtLength);
-
+		bool bIsExtEmpty = (ExtLength == 0);
 
 		// Handle extension here
 		switch (ExtType)
 		{
 		case ExtensionType::server_name:
-			extensions.push_back(std::make_shared<ServerNameExtension>(Buffer, Offset));
+			extensions.push_back(std::make_shared<ServerNameExtension>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::supported_groups:
-			extensions.push_back(std::make_shared<SupportedGroups>(Buffer, Offset));
+			extensions.push_back(std::make_shared<SupportedGroups>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::supported_versions:
-			extensions.push_back(std::make_shared<ClientSupportedVersions>(Buffer, Offset));
+			extensions.push_back(std::make_shared<ClientSupportedVersions>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::ec_points_format:
-			extensions.push_back(std::make_shared<ECPointFormats>(Buffer, Offset));
+			extensions.push_back(std::make_shared<ECPointFormats>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::application_layer_protocol_negotiation:
-			extensions.push_back(std::make_shared<AppLayerProtocolNegotiation>(Buffer, Offset));
+			extensions.push_back(std::make_shared<AppLayerProtocolNegotiation>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::status_request:
-			extensions.push_back(std::make_shared<StatusRequest>(Buffer, Offset));
+			extensions.push_back(std::make_shared<StatusRequest>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::signature_algorithms:
-			extensions.push_back(std::make_shared<SignatureHashAlgorithms>(Buffer, Offset));
+			extensions.push_back(std::make_shared<SignatureHashAlgorithms>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::key_share:
-			extensions.push_back(std::make_shared<KeyShare>(Buffer, Offset));
+			extensions.push_back(std::make_shared<KeyShare>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::psk_key_exchange_modes:
-			extensions.push_back(std::make_shared<PskKeyExchangeModes>(Buffer, Offset));
+			extensions.push_back(std::make_shared<PskKeyExchangeModes>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::compress_certificate:
-			extensions.push_back(std::make_shared<CompressCertificate>(Buffer, Offset));
+			extensions.push_back(std::make_shared<CompressCertificate>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::padding:
-			extensions.push_back(std::make_shared<Padding>(Buffer, Offset, ExtLength));
+			extensions.push_back(std::make_shared<Padding>(Buffer, Offset, ExtLength, bIsExtEmpty));
 			break;
-
 		case ExtensionType::extended_master_secret:
+			extensions.push_back(std::make_shared<ExtendedMasterSecret>(Buffer, Offset, ExtLength, bIsExtEmpty));
+			break;
+		case ExtensionType::GREASE_Reserved1:
+		case ExtensionType::GREASE_Reserved2:
+		case ExtensionType::GREASE_Reserved3:
+		case ExtensionType::GREASE_Reserved4:
+		case ExtensionType::GREASE_Reserved5:
+		case ExtensionType::GREASE_Reserved6:
+		case ExtensionType::GREASE_Reserved7:
+		case ExtensionType::GREASE_Reserved8:
+		case ExtensionType::GREASE_Reserved9:
+		case ExtensionType::GREASE_Reserved10:
+		case ExtensionType::GREASE_Reserved11:
+		case ExtensionType::GREASE_Reserved12:
+		case ExtensionType::GREASE_Reserved13:
+		case ExtensionType::GREASE_Reserved14:
+		case ExtensionType::GREASE_Reserved15:
+		case ExtensionType::GREASE_Reserved16:
+			extensions.push_back(std::make_shared<ReservedGREASE>(Buffer, Offset, ExtType, ExtLength, bIsExtEmpty));
+			break;
 		case ExtensionType::renegotiation_info:
 		case ExtensionType::max_fragment_length:
 		case ExtensionType::use_srtp:

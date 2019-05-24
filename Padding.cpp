@@ -1,9 +1,12 @@
 #include "Padding.h"
 
-Padding::Padding(const std::vector<char>& Buffer, size_t & Offset, unsigned short _PaddingSize) : 
+Padding::Padding(const std::vector<char>& Buffer, size_t & Offset, unsigned short _PaddingSize, bool bIsEmpty) :
 	PaddingSize(_PaddingSize)
 {
-	Deserialize(Buffer, Offset);
+	if (!bIsEmpty)
+	{
+		Deserialize(Buffer, Offset);
+	}
 }
 
 void Padding::Serialize(std::vector<char>& Buffer, size_t & Offset)

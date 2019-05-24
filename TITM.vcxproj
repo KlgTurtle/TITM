@@ -146,12 +146,14 @@
     <ClCompile Include="ClientHello.cpp" />
     <ClCompile Include="CompressCertificate.cpp" />
     <ClCompile Include="ECPointFormats.cpp" />
+    <ClCompile Include="ExtendedMasterSecret.cpp" />
     <ClCompile Include="HexPrinter.cpp" />
     <ClCompile Include="ITcpProxyManipulator.cpp" />
     <ClCompile Include="KeyShare.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Padding.cpp" />
     <ClCompile Include="PskKeyExchangeModes.cpp" />
+    <ClCompile Include="ReservedGREASE.cpp" />
     <ClCompile Include="ServerNameExtension.cpp" />
     <ClCompile Include="SignatureHashAlgorithms.cpp" />
     <ClCompile Include="StatusRequest.cpp" />
@@ -173,6 +175,7 @@
     <ClInclude Include="ClientHello.h" />
     <ClInclude Include="CompressCertificate.h" />
     <ClInclude Include="ECPointFormats.h" />
+    <ClInclude Include="ExtendedMasterSecret.h" />
     <ClInclude Include="HexPrinter.h" />
     <ClInclude Include="ITcpProxyManipulator.h" />
     <ClInclude Include="ITLSExtension.h" />
@@ -181,6 +184,7 @@
     <ClInclude Include="NamedGroups.h" />
     <ClInclude Include="Padding.h" />
     <ClInclude Include="PskKeyExchangeModes.h" />
+    <ClInclude Include="ReservedGREASE.h" />
     <ClInclude Include="SerializationHelper.h" />
     <ClInclude Include="ServerNameExtension.h" />
     <ClInclude Include="SignatureHashAlgorithms.h" />
