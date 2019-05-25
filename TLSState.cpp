@@ -43,11 +43,16 @@ std::shared_ptr<ITLSMessage> TLSState::Update(const std::vector<char>& DataBuffe
 
 std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 {
+	size_t Offset = 0;
+
 	std::shared_ptr<ITLSMessage> RetTLSMessage = nullptr;
 
-	TLSPlaintextHeader* TLSHeader = reinterpret_cast<TLSPlaintextHeader*>(m_CurrentMessageBuffer.data());
+	TLSPlaintextHeader* TLSHeader = reinterpret_cast<TLSPlaintextHeader*>(&m_CurrentMessageBuffer[Offset]);
+	Offset += sizeof(TLSPlaintextHeader);
+
 	unsigned short TLSHeaderLen = ntohs(TLSHeader->length);
-	HandshakeHeader* HSHeader = reinterpret_cast<HandshakeHeader*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
+	HandshakeHeader* HSHeader = reinterpret_cast<HandshakeHeader*>(&m_CurrentMessageBuffer[Offset]);
+	Offset += sizeof(HandshakeHeader);
 
 	std::vector<unsigned char> HSHeaderLengthBuf;
 	HSHeaderLengthBuf.resize(sizeof(unsigned int));
@@ -70,7 +75,7 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 	case HandshakeType::hello_request:
 		break;
 	case HandshakeType::client_hello:
-		RetTLSMessage = std::make_shared<ClientHello>(m_CurrentMessageBuffer);
+		RetTLSMessage = std::make_shared<ClientHello>(m_CurrentMessageBuffer, Offset);
 		break;
 	case HandshakeType::server_hello:
 		break;

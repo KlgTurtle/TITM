@@ -7,9 +7,12 @@
 struct ClientHello : public ITLSMessage
 {
 public:
-	ClientHello(const std::vector<char>& Buffer);
-	ProtocolVersion Version;
-	unsigned char random[32];
+	ClientHello() {}
+	ClientHello(const std::vector<char>& Buffer, size_t& Offset);
+
+	ClientHelloHeader CHHeader;
+	//ProtocolVersion Version;
+	//unsigned char random[32];
 	//unsigned char session_id_length;
 	std::vector<unsigned char> session_id;  // between 0 and 32 bytes
 											//unsigned short cipher_suites_length;
@@ -21,7 +24,7 @@ public:
 
 	virtual std::string ToString();
 protected:
-	virtual void Deserialize(const std::vector<char>& Buffer);
-	virtual void Serialize(std::vector<char>& Buffer);
+	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);
 	virtual void GetExtensions(const std::vector<char>& Buffer, size_t& Offset);
 };

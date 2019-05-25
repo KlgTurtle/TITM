@@ -138,9 +138,9 @@ public:
 	static void DeserializeVec(const std::vector<char>& Buffer, size_t& Offset, std::vector<FieldType>& OutVec)
 	{
 		OutVec.clear();
-		LengthType VecSize = Deserialize<LengthType>(Buffer, Offset);
+		LengthType VecSize = Deserialize<LengthType>(Buffer, Offset) / sizeof(FieldType);
 
-		for (size_t i = 0; i < VecSize / sizeof(FieldType); ++i)
+		for (size_t i = 0; i < VecSize; ++i)
 		{
 			FieldType Field = Deserialize<FieldType>(Buffer, Offset);
 			OutVec.push_back(Field);
@@ -162,7 +162,7 @@ public:
 	template <class FieldType, class LengthType>
 	static void SerializeVec(const std::vector<FieldType>& Vec, std::vector<char>& Buffer, size_t& Offset)
 	{
-		LengthType VecSize = static_cast<LengthType>(Vec.size());
+		LengthType VecSize = static_cast<LengthType>(Vec.size()) * sizeof(FieldType);
 		Serialize<LengthType>(VecSize, Buffer, Offset);
 
 		for (size_t i = 0; i < Vec.size(); ++i)
@@ -178,6 +178,26 @@ public:
 		{
 			Serialize<FieldType>(Vec[i], Buffer, Offset);
 		}
+	}
+
+	static void SerializeStruct(char* OpaqueStruct, size_t StructSize, std::vector<char>& Buffer, size_t& Offset)
+	{
+		if (Buffer.size() > 0)
+		{
+			memcpy(&Buffer[Offset], OpaqueStruct, StructSize);
+		}
+
+		Offset += StructSize;
+	}
+
+	static void DeserializeStruct(const std::vector<char>& Buffer, size_t& Offset, char* OpaqueStruct, size_t StructSize)
+	{
+		if (Buffer.size() > 0)
+		{
+			memcpy(OpaqueStruct, &Buffer[Offset], StructSize);
+		}
+
+		Offset += StructSize;
 	}
 };
 

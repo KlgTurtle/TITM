@@ -20,9 +20,9 @@
 #include "SignedCertificateTimestamp.h"
 #include "UnknownExtension.h"
 
-ClientHello::ClientHello(const std::vector<char>& Buffer)
+ClientHello::ClientHello(const std::vector<char>& Buffer, size_t& Offset)
 {
-	Deserialize(Buffer);
+	Deserialize(Buffer, Offset);
 }
 
 std::string ClientHello::ToString()
@@ -32,25 +32,25 @@ std::string ClientHello::ToString()
 	return "";
 }
 
-void ClientHello::Deserialize(const std::vector<char>& Buffer)
+void ClientHello::Deserialize(const std::vector<char>& Buffer, size_t& Offset)
 {
-	size_t Offset = sizeof(TLSPlaintextHeader) + sizeof(HandshakeHeader);
-
-	const ClientHelloHeader* CHHeader =
-		reinterpret_cast<const ClientHelloHeader*>(&Buffer[Offset]);
-
-	// Build ClientHello Header
-	this->Version = CHHeader->legacy_version;
-	memcpy(this->random, CHHeader->random, sizeof(CHHeader->random));
-	//RetClientHello->session_id_length = CHHeader->SessionIdLength;
-
-	Offset += sizeof(ClientHelloHeader);
-
+	SerializationHelper::DeserializeStruct(Buffer, Offset, reinterpret_cast<char*>(&CHHeader), sizeof(CHHeader));
 	SerializationHelper::DeserializeVec<unsigned char, unsigned char>(Buffer, Offset, this->session_id);
 	SerializationHelper::DeserializeVec<unsigned short, unsigned short>(Buffer, Offset, this->cipher_suites);
 	SerializationHelper::DeserializeVec<unsigned char, unsigned char>(Buffer, Offset, this->compression_methods);
 
 	GetExtensions(Buffer, Offset);
+
+	//std::vector<char> stambuf;
+	//stambuf.resize(Buffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeader));
+	//size_t offy = 0;
+	//Serialize(stambuf, offy);
+
+	//size_t offy1 = 0;
+	//extensions.clear();
+	//ClientHello other;
+	//other.Deserialize(stambuf, offy1);
+	//int z = 1;
 }
 
 
@@ -163,7 +163,29 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 }
 
 
-void ClientHello::Serialize(std::vector<char>& Buffer)
+void ClientHello::Serialize(std::vector<char>& Buffer, size_t& Offset)
 {
+	SerializationHelper::SerializeStruct(reinterpret_cast<char*>(&CHHeader), sizeof(CHHeader), Buffer, Offset);
+	SerializationHelper::SerializeVec<unsigned char, unsigned char>(this->session_id, Buffer, Offset);
+	SerializationHelper::SerializeVec<unsigned short, unsigned short>(this->cipher_suites, Buffer, Offset);
+	SerializationHelper::SerializeVec<unsigned char, unsigned char>(this->compression_methods, Buffer, Offset);
 
+	// leave space for total extensions length - we'll know it later.
+	size_t ExtStartOffset = Offset;
+	Offset += sizeof(unsigned short);
+	
+
+
+	for (size_t i = 0; i < extensions.size(); ++i)
+	{
+		SerializationHelper::Serialize<ExtensionType>(extensions[i]->GetType(), Buffer, Offset);
+		size_t ExtLenOffset = Offset;
+		Offset += sizeof(unsigned short);
+		extensions[i]->Serialize(Buffer, Offset);
+		unsigned short ExtLen = Offset - ExtLenOffset - sizeof(unsigned short);
+		SerializationHelper::Serialize<unsigned short>(ExtLen, Buffer, ExtLenOffset);
+	}
+
+	unsigned short ExtensionsLength = Offset - ExtStartOffset - sizeof(unsigned short);
+	SerializationHelper::Serialize<unsigned short>(ExtensionsLength, Buffer, ExtStartOffset);
 }
