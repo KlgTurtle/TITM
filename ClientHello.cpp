@@ -168,6 +168,13 @@ void ClientHello::GetExtensions(const std::vector<char>& Buffer, size_t& Offset)
 
 void ClientHello::Serialize(std::vector<char>& Buffer, size_t& Offset)
 {
+	std::vector<char> DummyBuffer;
+	DummyBuffer.clear();
+
+	// Don't serialize headers now, because we may need to update the lengths
+	SerializePlaintextHeader(DummyBuffer, Offset);
+	SerializeHandshakeHeader(DummyBuffer, Offset);
+
 	SerializationHelper::SerializeStruct(reinterpret_cast<char*>(&CHHeader), sizeof(CHHeader), Buffer, Offset);
 	SerializationHelper::SerializeVec<unsigned char, unsigned char>(this->session_id, Buffer, Offset);
 	SerializationHelper::SerializeVec<unsigned short, unsigned short>(this->cipher_suites, Buffer, Offset);
@@ -195,4 +202,12 @@ void ClientHello::Serialize(std::vector<char>& Buffer, size_t& Offset)
 	// Update the two bytes we left (much) earlier with the total length of all extensions
 	unsigned short TotalExtensionsLength = Offset - ExtStartOffset - sizeof(unsigned short);
 	SerializationHelper::Serialize<unsigned short>(TotalExtensionsLength, Buffer, ExtStartOffset);
+
+	// Now that we know the actual total length, we can update the TLS record header and
+	// the Handshake header with the appropriate ones and serialize them.
+	this->TLSHeader.length = Offset - sizeof(TLSPlaintextHeader);
+	this->HSHeader.length = this->TLSHeader.length - sizeof(HandshakeHeaderSerialized);
+	size_t OffsetTemp = 0;
+	SerializePlaintextHeader(Buffer, OffsetTemp);
+	SerializeHandshakeHeader(Buffer, OffsetTemp);
 }

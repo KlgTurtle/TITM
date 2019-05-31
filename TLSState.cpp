@@ -57,7 +57,7 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 	// Only proceed if we have the full handshake message. Otherwise wait for more bytes.
 	// Note that this is because according to the RFC, a TLS message of any type (Handshake/Alert/Application/CCS)
 	// MAY be split across several record layer messages!
-	if (HSHeaderLength > m_CurrentMessageBuffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeader))
+	if (HSHeaderLength > m_CurrentMessageBuffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeaderSerialized))
 	{
 		return nullptr;
 	}
@@ -92,21 +92,26 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 		break;
 	}
 
+	m_CurrentMessageBuffer.clear();
+
 	return RetTLSMessage;
 }
 
 std::shared_ptr<ITLSMessage> TLSState::GetChangeCipherSpecMsg()
 {
+	m_CurrentMessageBuffer.clear();
 	return nullptr;
 }
 
 std::shared_ptr<ITLSMessage> TLSState::GetApplicationDataMsg()
 {
+	m_CurrentMessageBuffer.clear();
 	return nullptr;
 }
 
 std::shared_ptr<ITLSMessage> TLSState::GetAlertMsg()
 {
+	m_CurrentMessageBuffer.clear();
 	return nullptr;
 }
 

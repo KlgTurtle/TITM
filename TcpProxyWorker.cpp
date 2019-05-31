@@ -1,11 +1,13 @@
 #include "TcpProxyWorker.h"
 #include "TcpSocketSelector.h"
 #include "TLS.h"
+#include "ClientHello.h"
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <algorithm>
 #include <iomanip>
+#include "Padding.h"
 
 TcpProxyWorker::TcpProxyWorker(const TITMParms& Parms, TcpSocket SourceSocket, const std::string & TargetAddress, 
 	const std::string & TargetPort) : m_Parms(Parms),
@@ -141,15 +143,39 @@ void TcpProxyWorker::DoParamDefinedActions(std::vector<char>& DataBuffer, const 
 			"Source->Dest" : "Dest->Source");
 		if (m_Parms.bDecodeAsTLS)
 		{
+			
 			std::shared_ptr<ITLSMessage> TLSMessage =
 				(Direction == TcpProxyDirection::SrcToDest) ?
 				m_SourceTLSState.Update(DataBuffer) :
 				m_TargetTLSState.Update(DataBuffer);
 
-			if (TLSMessage->TLSHeader.type == ContentType::handshake)
-			{
+			//if (TLSMessage.get() != nullptr && TLSMessage->GetType() == ContentType::handshake &&
+			//	((ITLSHandshakeMessage*)TLSMessage.get())->GetHandshakeType() == HandshakeType::client_hello)
+			//{
+			//	std::shared_ptr<ClientHello> CH = std::static_pointer_cast<ClientHello>(TLSMessage);
+			//	for (size_t i = 0; i < CH->extensions.size(); ++i)
+			//	{ 
+			//		if (CH->extensions[i]->GetType() == ExtensionType::supported_versions)
+			//		{
+			//			CH->extensions.erase(CH->extensions.begin() + i);
+			//			break;
+			//		}
+			//	}
+			//	size_t off = 0;
+			//	std::vector<char> db;
+			//	DataBuffer.clear();
+			//	//DataBuffer.resize(0);
+			//	TLSMessage->Serialize(DataBuffer, off);
+			//	DataBuffer.resize(off);
+			//	off = 0;
+			//	TLSMessage->Serialize(DataBuffer, off);
 
-			}
+
+			//
+
+
+			//	
+			//}
 
 			if (TLSMessage != nullptr)
 			{
