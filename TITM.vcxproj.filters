@@ -51,9 +51,6 @@
     <ClCompile Include="TLSState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TLS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ClientHello.cpp">
       <Filter>TLSMessages</Filter>
     </ClCompile>
@@ -107,6 +104,12 @@
     </ClCompile>
     <ClCompile Include="UnknownExtension.cpp">
       <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="ITLSMessage.cpp">
+      <Filter>TLSMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="TLS.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

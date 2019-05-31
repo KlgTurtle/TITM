@@ -4,7 +4,7 @@
 #include <memory>
 #include "ITLSMessage.h"
 
-struct ClientHello : public ITLSMessage
+struct ClientHello : public ITLSHandshakeMessage
 {
 public:
 	ClientHello() {}
@@ -23,6 +23,8 @@ public:
 	std::vector<std::shared_ptr<ITLSExtension>>   extensions;
 
 	virtual std::string ToString();
+
+	virtual HandshakeType GetHandshakeType() { return HandshakeType::client_hello; }
 protected:
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
 	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);

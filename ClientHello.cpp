@@ -34,6 +34,9 @@ std::string ClientHello::ToString()
 
 void ClientHello::Deserialize(const std::vector<char>& Buffer, size_t& Offset)
 {
+	DeserializePlaintextHeader(Buffer, Offset);
+	DeserializeHandshakeHeader(Buffer, Offset);
+
 	SerializationHelper::DeserializeStruct(Buffer, Offset, reinterpret_cast<char*>(&CHHeader), sizeof(CHHeader));
 	SerializationHelper::DeserializeVec<unsigned char, unsigned char>(Buffer, Offset, this->session_id);
 	SerializationHelper::DeserializeVec<unsigned short, unsigned short>(Buffer, Offset, this->cipher_suites);
@@ -170,22 +173,26 @@ void ClientHello::Serialize(std::vector<char>& Buffer, size_t& Offset)
 	SerializationHelper::SerializeVec<unsigned short, unsigned short>(this->cipher_suites, Buffer, Offset);
 	SerializationHelper::SerializeVec<unsigned char, unsigned char>(this->compression_methods, Buffer, Offset);
 
-	// leave space for total extensions length - we'll know it later.
+	// Leave space for total extensions length - we'll know it later.
 	size_t ExtStartOffset = Offset;
 	Offset += sizeof(unsigned short);
-	
-
 
 	for (size_t i = 0; i < extensions.size(); ++i)
 	{
 		SerializationHelper::Serialize<ExtensionType>(extensions[i]->GetType(), Buffer, Offset);
 		size_t ExtLenOffset = Offset;
+
+		// Leave space for this specific extension length
 		Offset += sizeof(unsigned short);
+
 		extensions[i]->Serialize(Buffer, Offset);
-		unsigned short ExtLen = Offset - ExtLenOffset - sizeof(unsigned short);
-		SerializationHelper::Serialize<unsigned short>(ExtLen, Buffer, ExtLenOffset);
+
+		// Update the two bytes we left earlier with the total extension length
+		unsigned short ExtensionLength = Offset - ExtLenOffset - sizeof(unsigned short);
+		SerializationHelper::Serialize<unsigned short>(ExtensionLength, Buffer, ExtLenOffset);
 	}
 
-	unsigned short ExtensionsLength = Offset - ExtStartOffset - sizeof(unsigned short);
-	SerializationHelper::Serialize<unsigned short>(ExtensionsLength, Buffer, ExtStartOffset);
+	// Update the two bytes we left (much) earlier with the total length of all extensions
+	unsigned short TotalExtensionsLength = Offset - ExtStartOffset - sizeof(unsigned short);
+	SerializationHelper::Serialize<unsigned short>(TotalExtensionsLength, Buffer, ExtStartOffset);
 }

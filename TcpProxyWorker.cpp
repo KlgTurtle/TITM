@@ -146,6 +146,11 @@ void TcpProxyWorker::DoParamDefinedActions(std::vector<char>& DataBuffer, const 
 				m_SourceTLSState.Update(DataBuffer) :
 				m_TargetTLSState.Update(DataBuffer);
 
+			if (TLSMessage->TLSHeader.type == ContentType::handshake)
+			{
+
+			}
+
 			if (TLSMessage != nullptr)
 			{
 				m_Parms.Printer->PrintRegular(TLSMessage->ToString());

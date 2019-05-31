@@ -24,6 +24,9 @@ struct TLSPlaintextHeader
 	ContentType type;
 	ProtocolVersion version;
 	unsigned short length;
+
+	void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+	void Serialize(std::vector<char>& Buffer, size_t& Offset);
 };
 
 
@@ -41,10 +44,19 @@ enum class HandshakeType : unsigned char
 	finished = 20
 };
 
+struct HandshakeHeaderSerialized
+{
+	HandshakeType msg_type;
+	unsigned char length[3];
+};
+
 struct HandshakeHeader
 {
-	HandshakeType msg_type;    /* handshake type */
-	unsigned char length[3];   /* bytes in message */
+	HandshakeType msg_type;
+	unsigned int length;
+
+	void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
+	void Serialize(std::vector<char>& Buffer, size_t& Offset);
 } ;
 
 struct ClientHelloHeader 

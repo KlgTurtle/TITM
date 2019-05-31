@@ -1,42 +1,46 @@
 #include "TLS.h"
-#include "ITLSMessage.h"
 
-std::string ITLSMessage::ToString()
+void TLSPlaintextHeader::Deserialize(const std::vector<char>& Buffer, size_t & Offset)
 {
-	std::string ContentTypeStr = "";
-	switch (TLSHeader.type)
-	{
-	case ContentType::change_cipher_spec:
-		ContentTypeStr = "Change Cipher Spec";
-		break;
-	case	ContentType::alert:
-		ContentTypeStr = "Alert";
-		break;
-	case	ContentType::handshake:
-		ContentTypeStr = "Handshake";
-		break;
-	case	ContentType::application_data:
-		ContentTypeStr = "Application Data";
-		break;
-	default:
-		ContentTypeStr = "*Unknown*";
-		break;
-	}
+	this->type = SerializationHelper::Deserialize<ContentType>(Buffer, Offset);
+	this->version.major = SerializationHelper::Deserialize<unsigned char>(Buffer, Offset);
+	this->version.minor = SerializationHelper::Deserialize<unsigned char>(Buffer, Offset);
+	this->length = SerializationHelper::Deserialize<unsigned short>(Buffer, Offset);
+}
 
-	std::string VersionStr = "";
-	if (TLSHeader.version.major == 3 && TLSHeader.version.minor >= 1)
-	{
-		VersionStr = "TLSv1." + std::to_string(TLSHeader.version.minor - 1);
-	}
-	else
-	{
-		VersionStr += "SSLv" + std::to_string(TLSHeader.version.major) + ".0";
-	}
+void TLSPlaintextHeader::Serialize(std::vector<char>& Buffer, size_t & Offset)
+{
+	SerializationHelper::Serialize<ContentType>(this->type, Buffer, Offset);
+	SerializationHelper::Serialize<unsigned char>(this->version.major, Buffer, Offset);
+	SerializationHelper::Serialize<unsigned char>(this->version.minor, Buffer, Offset);
+	SerializationHelper::Serialize<unsigned short>(this->length, Buffer, Offset);
+}
 
-	std::string LengthStr = std::to_string(TLSHeader.length);
+void HandshakeHeader::Deserialize(const std::vector<char>& Buffer, size_t & Offset)
+{
+	HandshakeHeaderSerialized SerializedHSHeader;
+	SerializationHelper::DeserializeStruct(Buffer, Offset, reinterpret_cast<char*>(&SerializedHSHeader),
+		sizeof(SerializedHSHeader));
 
-	return
-		"Content Type:" + ContentTypeStr + "\n"
-		"Version:     " + VersionStr + "\n" +
-		"Length:      " + LengthStr;
+	this->msg_type = SerializedHSHeader.msg_type;
+
+	std::vector<unsigned char> HSHeaderLengthBuf;
+	HSHeaderLengthBuf.resize(sizeof(this->length));
+	memset(HSHeaderLengthBuf.data(), 0x00, HSHeaderLengthBuf.size());
+	memcpy(&HSHeaderLengthBuf[1], SerializedHSHeader.length, sizeof(SerializedHSHeader.length));
+
+	this->length = ntohl(*reinterpret_cast<unsigned long*>(HSHeaderLengthBuf.data()));
+}
+
+void HandshakeHeader::Serialize(std::vector<char>& Buffer, size_t & Offset)
+{
+	HandshakeHeaderSerialized SerializedHSHeader;
+	SerializedHSHeader.msg_type = this->msg_type;
+
+	unsigned int lengthBE = htonl(this->length);
+	unsigned char* pLengthBE = 1 + (unsigned char*)&lengthBE;
+	memcpy(&SerializedHSHeader.length, pLengthBE, sizeof(SerializedHSHeader.length));
+	
+	SerializationHelper::SerializeStruct(reinterpret_cast<char*>(&SerializedHSHeader), 
+		sizeof(SerializedHSHeader), Buffer, Offset);
 }

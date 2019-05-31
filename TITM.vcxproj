@@ -170,6 +170,7 @@
     <ClCompile Include="TcpProxyWorker.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
     <ClCompile Include="TcpSocketSelector.cpp" />
+    <ClCompile Include="ITLSMessage.cpp" />
     <ClCompile Include="TLS.cpp" />
     <ClCompile Include="TLSState.cpp" />
     <ClCompile Include="UnknownExtension.cpp" />
