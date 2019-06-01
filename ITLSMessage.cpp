@@ -20,6 +20,9 @@
 #include "SessionTicket.h"
 #include "SignedCertificateTimestamp.h"
 #include "UnknownExtension.h"
+#include "ServerKeyShare.h"
+#include "ClientPreSharedKey.h"
+#include "ServerPreSharedKey.h"
 #include <memory>
 
 std::string ITLSMessage::ToString()
@@ -127,7 +130,14 @@ void ITLSHandshakeMessage::GetExtensions(const std::vector<char>& Buffer, size_t
 			outExtensions.push_back(std::make_shared<SignatureHashAlgorithms>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::key_share:
-			outExtensions.push_back(std::make_shared<ClientKeyShare>(Buffer, Offset, bIsExtEmpty));
+			if (GetHandshakeType() == HandshakeType::client_hello)
+			{
+				outExtensions.push_back(std::make_shared<ClientKeyShare>(Buffer, Offset, bIsExtEmpty));
+			}
+			else
+			{
+				outExtensions.push_back(std::make_shared<ServerKeyShare>(Buffer, Offset, bIsExtEmpty));
+			}
 			break;
 		case ExtensionType::psk_key_exchange_modes:
 			outExtensions.push_back(std::make_shared<PskKeyExchangeModes>(Buffer, Offset, bIsExtEmpty));
@@ -149,6 +159,16 @@ void ITLSHandshakeMessage::GetExtensions(const std::vector<char>& Buffer, size_t
 			break;
 		case ExtensionType::signed_certificate_timestamp:
 			outExtensions.push_back(std::make_shared<SignedCertificateTimestamp>(Buffer, Offset, ExtLength, bIsExtEmpty));
+			break;
+		case ExtensionType::pre_shared_key:
+			if (GetHandshakeType() == HandshakeType::client_hello)
+			{
+				outExtensions.push_back(std::make_shared<ClientPreSharedKey>(Buffer, Offset, bIsExtEmpty));
+			}
+			else
+			{
+				outExtensions.push_back(std::make_shared<ServerPreSharedKey>(Buffer, Offset, bIsExtEmpty));
+			}
 			break;
 		case ExtensionType::GREASE_Reserved1:
 		case ExtensionType::GREASE_Reserved2:
@@ -173,7 +193,7 @@ void ITLSHandshakeMessage::GetExtensions(const std::vector<char>& Buffer, size_t
 		case ExtensionType::heartbeat:
 		case ExtensionType::client_certificate_type:
 		case ExtensionType::server_certificate_type:
-		case ExtensionType::pre_shared_key:
+		
 		case ExtensionType::early_data:
 		case ExtensionType::cookie:
 		case ExtensionType::certificate_authorities:

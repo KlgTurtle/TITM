@@ -72,9 +72,6 @@
     <ClCompile Include="SignatureHashAlgorithms.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="KeyShare.cpp">
-      <Filter>Extensions</Filter>
-    </ClCompile>
     <ClCompile Include="PskKeyExchangeModes.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
@@ -113,6 +110,21 @@
     </ClCompile>
     <ClCompile Include="ServerHello.cpp">
       <Filter>TLSMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientKeyShare.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerKeyShare.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerSupportedVersions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientPreSharedKey.cpp">
+      <Filter>Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerPreSharedKey.cpp">
+      <Filter>Extensions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -185,9 +197,6 @@
     <ClInclude Include="NamedGroups.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KeyShare.h">
-      <Filter>Extensions</Filter>
-    </ClInclude>
     <ClInclude Include="PskKeyExchangeModes.h">
       <Filter>Extensions</Filter>
     </ClInclude>
@@ -217,6 +226,21 @@
     </ClInclude>
     <ClInclude Include="ServerHello.h">
       <Filter>TLSMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientKeyShare.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerKeyShare.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerSupportedVersions.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerPreSharedKey.h">
+      <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientPreSharedKey.h">
+      <Filter>Extensions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
