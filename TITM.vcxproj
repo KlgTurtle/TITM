@@ -155,6 +155,7 @@
     <ClCompile Include="PskKeyExchangeModes.cpp" />
     <ClCompile Include="RenegotiationInfo.cpp" />
     <ClCompile Include="ReservedGREASE.cpp" />
+    <ClCompile Include="ServerHello.cpp" />
     <ClCompile Include="ServerNameExtension.cpp" />
     <ClCompile Include="SessionTicket.cpp" />
     <ClCompile Include="SignatureHashAlgorithms.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="RenegotiationInfo.h" />
     <ClInclude Include="ReservedGREASE.h" />
     <ClInclude Include="SerializationHelper.h" />
+    <ClInclude Include="ServerHello.h" />
     <ClInclude Include="ServerNameExtension.h" />
     <ClInclude Include="SessionTicket.h" />
     <ClInclude Include="SignatureHashAlgorithms.h" />

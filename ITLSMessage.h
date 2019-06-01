@@ -24,4 +24,5 @@ struct ITLSHandshakeMessage : public ITLSMessage
 	virtual ContentType GetType() { return ContentType::handshake; }
 	virtual void SerializeHandshakeHeader(std::vector<char>& Buffer, size_t& Offset);
 	virtual void DeserializeHandshakeHeader(const std::vector<char>& Buffer, size_t& Offset);
+	virtual void GetExtensions(const std::vector<char>& Buffer, size_t& Offset, std::vector<std::shared_ptr<ITLSExtension>>& outExtensions);
 };

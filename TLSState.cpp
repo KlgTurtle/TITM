@@ -1,6 +1,8 @@
 #include "TLSState.h"
 #include <WinSock2.h>
 #include "ClientHello.h"
+#include "ServerHello.h"
+
 TLSState::TLSState() 
 {
 	m_CurrentMessageBuffer.clear();
@@ -73,6 +75,7 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 		RetTLSMessage = std::make_shared<ClientHello>(m_CurrentMessageBuffer, Offset);
 		break;
 	case HandshakeType::server_hello:
+		RetTLSMessage = std::make_shared<ServerHello>(m_CurrentMessageBuffer, Offset);
 		break;
 	case HandshakeType::certificate:
 		break;

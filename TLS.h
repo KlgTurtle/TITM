@@ -65,6 +65,10 @@ struct ClientHelloHeader
 	unsigned char random[32];
 } ;
 
+typedef ClientHelloHeader ServerHelloHeader;
+
+
+
 
 #pragma pack(pop)
 

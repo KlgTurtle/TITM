@@ -111,6 +111,9 @@
     <ClCompile Include="TLS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ServerHello.cpp">
+      <Filter>TLSMessages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -211,6 +214,9 @@
     </ClInclude>
     <ClInclude Include="UnknownExtension.h">
       <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerHello.h">
+      <Filter>TLSMessages</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
