@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppLayerProtocolNegotiation.cpp" />
+    <ClCompile Include="ChangeCipherSpec.cpp" />
     <ClCompile Include="ClientHello.cpp" />
     <ClCompile Include="CompressCertificate.cpp" />
     <ClCompile Include="ECPointFormats.cpp" />
@@ -182,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppLayerProtocolNegotiation.h" />
+    <ClInclude Include="ChangeCipherSpec.h" />
     <ClInclude Include="ClientHello.h" />
     <ClInclude Include="CompressCertificate.h" />
     <ClInclude Include="ECPointFormats.h" />

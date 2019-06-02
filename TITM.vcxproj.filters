@@ -126,6 +126,9 @@
     <ClCompile Include="ServerPreSharedKey.cpp">
       <Filter>Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="ChangeCipherSpec.cpp">
+      <Filter>TLSMessages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -241,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="ClientPreSharedKey.h">
       <Filter>Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeCipherSpec.h">
+      <Filter>TLSMessages</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

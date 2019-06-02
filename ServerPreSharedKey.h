@@ -10,5 +10,5 @@ struct ServerPreSharedKey : public ITLSExtension
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
 	virtual ExtensionType GetType() { return ExtensionType::pre_shared_key; }
 
-
+	unsigned short SelectedIdentity;
 };

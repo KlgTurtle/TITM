@@ -7,9 +7,8 @@ class TLSState
 {
 public:
 	TLSState();
+	virtual void Update(const std::vector<char>& DataBuffer, std::vector<std::shared_ptr<ITLSMessage>>& OutTLSMessages);
 	virtual ~TLSState() {}
-
-	virtual std::shared_ptr<ITLSMessage> Update(const std::vector<char>& DataBuffer);
 	
 
 

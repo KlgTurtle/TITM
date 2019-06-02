@@ -42,28 +42,7 @@ void ClientHello::Serialize(std::vector<char>& Buffer, size_t& Offset)
 	SerializationHelper::SerializeVec<unsigned short, unsigned short>(this->cipher_suites, Buffer, Offset);
 	SerializationHelper::SerializeVec<unsigned char, unsigned char>(this->compression_methods, Buffer, Offset);
 
-	// Leave space for total extensions length - we'll know it later.
-	size_t ExtStartOffset = Offset;
-	Offset += sizeof(unsigned short);
-
-	for (size_t i = 0; i < extensions.size(); ++i)
-	{
-		SerializationHelper::Serialize<ExtensionType>(extensions[i]->GetType(), Buffer, Offset);
-		size_t ExtLenOffset = Offset;
-
-		// Leave space for this specific extension length
-		Offset += sizeof(unsigned short);
-
-		extensions[i]->Serialize(Buffer, Offset);
-
-		// Update the two bytes we left earlier with the total extension length
-		unsigned short ExtensionLength = Offset - ExtLenOffset - sizeof(unsigned short);
-		SerializationHelper::Serialize<unsigned short>(ExtensionLength, Buffer, ExtLenOffset);
-	}
-
-	// Update the two bytes we left (much) earlier with the total length of all extensions
-	unsigned short TotalExtensionsLength = Offset - ExtStartOffset - sizeof(unsigned short);
-	SerializationHelper::Serialize<unsigned short>(TotalExtensionsLength, Buffer, ExtStartOffset);
+	SerializeExtensions(extensions, Buffer, Offset);
 
 	// Now that we know the actual total length, we can update the TLS record header and
 	// the Handshake header with the appropriate ones and serialize them.

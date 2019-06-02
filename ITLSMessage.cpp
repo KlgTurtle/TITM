@@ -23,6 +23,7 @@
 #include "ServerKeyShare.h"
 #include "ClientPreSharedKey.h"
 #include "ServerPreSharedKey.h"
+#include "ServerSupportedVersions.h"
 #include <memory>
 
 std::string ITLSMessage::ToString()
@@ -115,7 +116,14 @@ void ITLSHandshakeMessage::GetExtensions(const std::vector<char>& Buffer, size_t
 			outExtensions.push_back(std::make_shared<SupportedGroups>(Buffer, Offset, bIsExtEmpty));
 			break;
 		case ExtensionType::supported_versions:
-			outExtensions.push_back(std::make_shared<ClientSupportedVersions>(Buffer, Offset, bIsExtEmpty));
+			if (GetHandshakeType() == HandshakeType::client_hello)
+			{
+				outExtensions.push_back(std::make_shared<ClientSupportedVersions>(Buffer, Offset, bIsExtEmpty));
+			}
+			else
+			{
+				outExtensions.push_back(std::make_shared<ServerSupportedVersions>(Buffer, Offset, bIsExtEmpty));
+			}
 			break;
 		case ExtensionType::ec_points_format:
 			outExtensions.push_back(std::make_shared<ECPointFormats>(Buffer, Offset, bIsExtEmpty));
@@ -209,4 +217,30 @@ void ITLSHandshakeMessage::GetExtensions(const std::vector<char>& Buffer, size_t
 
 		ExtensionsLength -= (ExtLength + sizeof(ExtensionType) + sizeof(ExtLength));
 	}
+}
+
+void ITLSHandshakeMessage::SerializeExtensions(const std::vector<std::shared_ptr<ITLSExtension>>& inExtensions, std::vector<char>& Buffer, size_t & Offset)
+{
+	// Leave space for total extensions length - we'll know it later.
+	size_t ExtStartOffset = Offset;
+	Offset += sizeof(unsigned short);
+
+	for (size_t i = 0; i < inExtensions.size(); ++i)
+	{
+		SerializationHelper::Serialize<ExtensionType>(inExtensions[i]->GetType(), Buffer, Offset);
+		size_t ExtLenOffset = Offset;
+
+		// Leave space for this specific extension length
+		Offset += sizeof(unsigned short);
+
+		inExtensions[i]->Serialize(Buffer, Offset);
+
+		// Update the two bytes we left earlier with the total extension length
+		unsigned short ExtensionLength = Offset - ExtLenOffset - sizeof(unsigned short);
+		SerializationHelper::Serialize<unsigned short>(ExtensionLength, Buffer, ExtLenOffset);
+	}
+
+	// Update the two bytes we left (much) earlier with the total length of all extensions
+	unsigned short TotalExtensionsLength = Offset - ExtStartOffset - sizeof(unsigned short);
+	SerializationHelper::Serialize<unsigned short>(TotalExtensionsLength, Buffer, ExtStartOffset);
 }

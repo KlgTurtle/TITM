@@ -2,26 +2,28 @@
 #include <WinSock2.h>
 #include "ClientHello.h"
 #include "ServerHello.h"
+#include "ChangeCipherSpec.h"
 
 TLSState::TLSState() 
 {
 	m_CurrentMessageBuffer.clear();
 }
 
-std::shared_ptr<ITLSMessage> TLSState::Update(const std::vector<char>& DataBuffer)
+void TLSState::Update(const std::vector<char>& DataBuffer, std::vector<std::shared_ptr<ITLSMessage>>& OutTLSMessages)
 {
-	std::shared_ptr<ITLSMessage> ReturnMsg = nullptr;
+	OutTLSMessages.clear();
 
 	m_CurrentMessageBuffer.insert(m_CurrentMessageBuffer.end(), DataBuffer.begin(), DataBuffer.end());
 
 	// If we have a header and also a buffered message with the number specified in the header or more
 	// it means we can parse a full message now.
-	if (m_CurrentMessageBuffer.size() >= sizeof(TLSPlaintextHeader)) 
+	while (m_CurrentMessageBuffer.size() >= sizeof(TLSPlaintextHeader)) 
 	{
 		TLSPlaintextHeader* CurrentHeader = reinterpret_cast<TLSPlaintextHeader*>(m_CurrentMessageBuffer.data());
 		unsigned short CurrHeaderLength = ntohs(CurrentHeader->length);
 		if (m_CurrentMessageBuffer.size() >= CurrHeaderLength + sizeof(TLSPlaintextHeader))
 		{
+			std::shared_ptr<ITLSMessage> ReturnMsg = nullptr;
 			switch (CurrentHeader->type)
 			{
 			case ContentType::handshake:
@@ -37,10 +39,17 @@ std::shared_ptr<ITLSMessage> TLSState::Update(const std::vector<char>& DataBuffe
 				ReturnMsg = GetAlertMsg();
 				break;
 			}	
+
+			if (ReturnMsg != nullptr)
+			{
+				OutTLSMessages.push_back(ReturnMsg);
+			}
+		}
+		else
+		{
+			break;
 		}
 	}
-
-	return ReturnMsg;
 }
 
 std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
@@ -95,15 +104,18 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 		break;
 	}
 
-	m_CurrentMessageBuffer.clear();
+	m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + Offset);
 
 	return RetTLSMessage;
 }
 
 std::shared_ptr<ITLSMessage> TLSState::GetChangeCipherSpecMsg()
 {
-	m_CurrentMessageBuffer.clear();
-	return nullptr;
+	size_t Offset = 0;
+
+	std::shared_ptr<ITLSMessage> RetTLSMessage = std::make_shared<ChangeCipherSpec>(m_CurrentMessageBuffer, Offset);
+	m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + Offset);
+	return RetTLSMessage;
 }
 
 std::shared_ptr<ITLSMessage> TLSState::GetApplicationDataMsg()

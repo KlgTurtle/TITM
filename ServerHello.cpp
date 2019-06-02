@@ -25,6 +25,27 @@ void ServerHello::Deserialize(const std::vector<char>& Buffer, size_t & Offset)
 
 void ServerHello::Serialize(std::vector<char>& Buffer, size_t & Offset)
 {
+	std::vector<char> DummyBuffer;
+	DummyBuffer.clear();
+
+	// Don't serialize headers now, because we may need to update the lengths
+	SerializePlaintextHeader(DummyBuffer, Offset);
+	SerializeHandshakeHeader(DummyBuffer, Offset);
+
+	SerializationHelper::SerializeStruct(reinterpret_cast<char*>(&this->SHHeader), sizeof(this->SHHeader), Buffer, Offset);
+	SerializationHelper::SerializeVec<unsigned char, unsigned char>(this->session_id, Buffer, Offset);
+	SerializationHelper::Serialize<unsigned short>(this->cipher_suite, Buffer, Offset);
+	SerializationHelper::Serialize<unsigned char>(this->legacy_compression_method, Buffer, Offset);
+
+	SerializeExtensions(extensions, Buffer, Offset);
+
+	// Now that we know the actual total length, we can update the TLS record header and
+	// the Handshake header with the appropriate ones and serialize them.
+	this->TLSHeader.length = Offset - sizeof(TLSPlaintextHeader);
+	this->HSHeader.length = this->TLSHeader.length - sizeof(HandshakeHeaderSerialized);
+	size_t OffsetTemp = 0;
+	SerializePlaintextHeader(Buffer, OffsetTemp);
+	SerializeHandshakeHeader(Buffer, OffsetTemp);
 
 }
 

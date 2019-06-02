@@ -2,12 +2,14 @@
 #include "TcpSocketSelector.h"
 #include "TLS.h"
 #include "ClientHello.h"
+#include "ServerHello.h"
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <algorithm>
 #include <iomanip>
 #include "Padding.h"
+#include "ServerSupportedVersions.h"
 
 TcpProxyWorker::TcpProxyWorker(const TITMParms& Parms, TcpSocket SourceSocket, const std::string & TargetAddress, 
 	const std::string & TargetPort) : m_Parms(Parms),
@@ -143,44 +145,60 @@ void TcpProxyWorker::DoParamDefinedActions(std::vector<char>& DataBuffer, const 
 			"Source->Dest" : "Dest->Source");
 		if (m_Parms.bDecodeAsTLS)
 		{
-			
-			std::shared_ptr<ITLSMessage> TLSMessage =
-				(Direction == TcpProxyDirection::SrcToDest) ?
-				m_SourceTLSState.Update(DataBuffer) :
-				m_TargetTLSState.Update(DataBuffer);
+			std::vector<std::shared_ptr<ITLSMessage>> TLSMessages;
+			(Direction == TcpProxyDirection::SrcToDest) ?
+				m_SourceTLSState.Update(DataBuffer, TLSMessages) :
+				m_TargetTLSState.Update(DataBuffer, TLSMessages);
 
-			//if (TLSMessage.get() != nullptr && TLSMessage->GetType() == ContentType::handshake &&
-			//	((ITLSHandshakeMessage*)TLSMessage.get())->GetHandshakeType() == HandshakeType::client_hello)
-			//{
-			//	std::shared_ptr<ClientHello> CH = std::static_pointer_cast<ClientHello>(TLSMessage);
-			//	for (size_t i = 0; i < CH->extensions.size(); ++i)
-			//	{ 
-			//		if (CH->extensions[i]->GetType() == ExtensionType::supported_versions)
-			//		{
-			//			CH->extensions.erase(CH->extensions.begin() + i);
-			//			break;
-			//		}
-			//	}
-			//	size_t off = 0;
-			//	std::vector<char> db;
-			//	DataBuffer.clear();
-			//	//DataBuffer.resize(0);
-			//	TLSMessage->Serialize(DataBuffer, off);
-			//	DataBuffer.resize(off);
-			//	off = 0;
-			//	TLSMessage->Serialize(DataBuffer, off);
-
-
-			//
-
-
-			//	
-			//}
-
-			if (TLSMessage != nullptr)
+			for each (auto TLSMessage in TLSMessages)
 			{
-				m_Parms.Printer->PrintRegular(TLSMessage->ToString());
+				//if (TLSMessage->GetType() == ContentType::handshake &&
+				//	((ITLSHandshakeMessage*)TLSMessage.get())->GetHandshakeType() == HandshakeType::server_hello)
+				//{
+				//	std::shared_ptr<ServerHello> SH = std::static_pointer_cast<ServerHello>(TLSMessage);
+				//	for (size_t i = 0; i < SH->extensions.size(); ++i)
+				//	{
+				//		if (SH->extensions[i]->GetType() == ExtensionType::supported_versions)
+				//		{
+				//			std::shared_ptr<ServerSupportedVersions> ssv = std::static_pointer_cast<ServerSupportedVersions>(SH->extensions[i]);
+				//			ssv->ChosenVersion.major = 0xBE;
+				//			//SH->extensions.erase(SH->extensions.begin() + i);
+				//			break;
+				//		}
+				//	}
+				//	size_t off = 0;
+
+				//	//std::vector<char> db;
+				//	//db.clear();
+				//	//DataBuffer.resize(0);
+				//	//TLSMessage->Serialize(db, off);
+				//	//db.resize(off);
+
+				//	std::vector<char> tmp = DataBuffer;
+				//	//DataBuffer.erase(DataBuffer.begin(), DataBuffer.begin() + off);
+				//	off = 0;
+				//	TLSMessage->Serialize(DataBuffer, off);
+
+				//	if (tmp != DataBuffer)
+				//	{
+				//		int z = 1;
+				//	}
+
+
+
+				//}
+				
+
+				if (TLSMessage != nullptr)
+				{
+					m_Parms.Printer->PrintRegular(TLSMessage->ToString());
+				}
+
+
+				
 			}
+
+			
 		}
 		else
 		{
