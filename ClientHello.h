@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "ITLSMessage.h"
+#include "ITLSHandshakeMessage.h"
 
 struct ClientHello : public ITLSHandshakeMessage
 {

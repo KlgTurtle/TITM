@@ -3,6 +3,7 @@
 #include "ClientHello.h"
 #include "ServerHello.h"
 #include "ChangeCipherSpec.h"
+#include "Certificate.h"
 
 TLSState::TLSState() 
 {
@@ -87,6 +88,7 @@ std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
 		RetTLSMessage = std::make_shared<ServerHello>(m_CurrentMessageBuffer, Offset);
 		break;
 	case HandshakeType::certificate:
+		RetTLSMessage = std::make_shared<Certificate>(m_CurrentMessageBuffer, Offset);
 		break;
 	case HandshakeType::server_key_exchange:
 		break;

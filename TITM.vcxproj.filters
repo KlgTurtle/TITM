@@ -129,6 +129,12 @@
     <ClCompile Include="ChangeCipherSpec.cpp">
       <Filter>TLSMessages</Filter>
     </ClCompile>
+    <ClCompile Include="ITLSHandshakeMessage.cpp">
+      <Filter>TLSMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="Certificate.cpp">
+      <Filter>TLSMessages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -246,6 +252,12 @@
       <Filter>Extensions</Filter>
     </ClInclude>
     <ClInclude Include="ChangeCipherSpec.h">
+      <Filter>TLSMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="ITLSHandshakeMessage.h">
+      <Filter>TLSMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="Certificate.h">
       <Filter>TLSMessages</Filter>
     </ClInclude>
   </ItemGroup>

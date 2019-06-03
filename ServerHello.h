@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "ITLSMessage.h"
+#include "ITLSHandshakeMessage.h"
 
 /*struct {
           ProtocolVersion legacy_version = 0x0303;     TLS v1.2
