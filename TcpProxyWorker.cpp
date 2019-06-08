@@ -141,8 +141,8 @@ void TcpProxyWorker::DoParamDefinedActions(std::vector<char>& DataBuffer, const 
 	if ((Direction == TcpProxyDirection::SrcToDest && m_Parms.bPrintSrc) || 
 		(Direction == TcpProxyDirection::DestToSrc && m_Parms.bPrintDst))
 	{
-		m_Parms.Printer->PrintRegular(Direction == TcpProxyDirection::SrcToDest ?
-			"Source->Dest" : "Dest->Source");
+	//	m_Parms.Printer->PrintRegular(Direction == TcpProxyDirection::SrcToDest ?
+		//	"Source->Dest" : "Dest->Source");
 		if (m_Parms.bDecodeAsTLS)
 		{
 			std::vector<std::shared_ptr<ITLSMessage>> TLSMessages;
@@ -150,8 +150,8 @@ void TcpProxyWorker::DoParamDefinedActions(std::vector<char>& DataBuffer, const 
 				m_SourceTLSState.Update(DataBuffer, TLSMessages) :
 				m_TargetTLSState.Update(DataBuffer, TLSMessages);
 
-			for each (auto TLSMessage in TLSMessages)
-			{
+			//for each (auto TLSMessage in TLSMessages)
+			//{
 				//if (TLSMessage->GetType() == ContentType::handshake &&
 				//	((ITLSHandshakeMessage*)TLSMessage.get())->GetHandshakeType() == HandshakeType::server_hello)
 				//{
@@ -189,14 +189,14 @@ void TcpProxyWorker::DoParamDefinedActions(std::vector<char>& DataBuffer, const 
 				//}
 				
 
-				if (TLSMessage != nullptr)
-				{
-					m_Parms.Printer->PrintRegular(TLSMessage->ToString());
-				}
+				//if (TLSMessage != nullptr)
+				//{
+				//	m_Parms.Printer->PrintRegular(TLSMessage->ToString());
+				//}
 
 
 				
-			}
+			//}
 
 			
 		}

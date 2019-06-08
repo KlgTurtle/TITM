@@ -143,7 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppLayerProtocolNegotiation.cpp" />
-    <ClCompile Include="Certificate.cpp" />
+    <ClCompile Include="ServerCertificate.cpp" />
     <ClCompile Include="ChangeCipherSpec.cpp" />
     <ClCompile Include="ClientHello.cpp" />
     <ClCompile Include="CompressCertificate.cpp" />
@@ -181,12 +181,16 @@
     <ClCompile Include="ITLSMessage.cpp" />
     <ClCompile Include="TLS.cpp" />
     <ClCompile Include="TLSState.cpp" />
+    <ClCompile Include="TLSStateClient.cpp" />
+    <ClCompile Include="TLSStateServer.cpp" />
     <ClCompile Include="UnknownExtension.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppLayerProtocolNegotiation.h" />
-    <ClInclude Include="Certificate.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="ServerCertificate.h" />
     <ClInclude Include="ChangeCipherSpec.h" />
+    <ClInclude Include="ClientCertificate.h" />
     <ClInclude Include="ClientHello.h" />
     <ClInclude Include="CompressCertificate.h" />
     <ClInclude Include="ECPointFormats.h" />
@@ -224,6 +228,8 @@
     <ClInclude Include="TITMParms.h" />
     <ClInclude Include="TLS.h" />
     <ClInclude Include="TLSState.h" />
+    <ClInclude Include="TLSStateClient.h" />
+    <ClInclude Include="TLSStateServer.h" />
     <ClInclude Include="UnknownExtension.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

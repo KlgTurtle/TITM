@@ -3,7 +3,9 @@
 #include "ClientHello.h"
 #include "ServerHello.h"
 #include "ChangeCipherSpec.h"
-#include "Certificate.h"
+#include "ServerCertificate.h"
+#define DEBUG_PRINTS
+#include "Common.h"
 
 TLSState::TLSState() 
 {
@@ -28,16 +30,26 @@ void TLSState::Update(const std::vector<char>& DataBuffer, std::vector<std::shar
 			switch (CurrentHeader->type)
 			{
 			case ContentType::handshake:
+				dbgprintf("handshake\n");
 				ReturnMsg = GetHandshakeMsg();
 				break;
 			case ContentType::change_cipher_spec:
+				dbgprintf("change_cipher_spec\n");
 				ReturnMsg = GetChangeCipherSpecMsg();
 				break;
 			case ContentType::application_data:
-				ReturnMsg = GetApplicationDataMsg();
+			//	dbgprintf("application_data\n");
+				m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + CurrHeaderLength + sizeof(TLSPlaintextHeader));
+				//ReturnMsg = GetApplicationDataMsg();
 				break;
 			case ContentType::alert:
-				ReturnMsg = GetAlertMsg();
+				dbgprintf("alert\n");
+				m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + CurrHeaderLength + sizeof(TLSPlaintextHeader));
+				//ReturnMsg = GetAlertMsg();
+				break;
+			default:
+				m_CurrentMessageBuffer.clear();
+				dbgprintf("!!!UNKNOWN!!!\n");
 				break;
 			}	
 
@@ -89,100 +101,9 @@ unsigned int TLSState::GetHSHeaderLength()
 	return HSHeaderLength;
 }
 
-TLSStateClient::TLSStateClient()
-{
-}
-
-TLSStateServer::TLSStateServer()
-{
-}
-
-std::shared_ptr<ITLSMessage> TLSStateClient::GetHandshakeMsg()
-{
-	std::shared_ptr<ITLSMessage> RetTLSMessage = nullptr;
-	HandshakeHeaderSerialized* HSHeader = reinterpret_cast<HandshakeHeaderSerialized*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
-	unsigned int HSHeaderLength = GetHSHeaderLength();
-
-	// Only proceed if we have the full handshake message. Otherwise wait for more bytes.
-	// Note that this is because according to the RFC, a TLS message of any type (Handshake/Alert/Application/CCS)
-	// MAY be split across several record layer messages!
-	if (HSHeaderLength > m_CurrentMessageBuffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeaderSerialized))
-	{
-		return nullptr;
-	}
-
-
-	size_t Offset = 0;
-
-	switch (HSHeader->msg_type)
-	{
-	case HandshakeType::client_hello:
-		RetTLSMessage = std::make_shared<ClientHello>(m_CurrentMessageBuffer, Offset);
-		break;
-	case HandshakeType::certificate:
-		RetTLSMessage = std::make_shared<Certificate>(m_CurrentMessageBuffer, Offset, HSHeaderLength);
-		break;
-	case HandshakeType::certificate_verify:
-		break;
-	case HandshakeType::client_key_exchange:
-		break;
-	case HandshakeType::finished:
-		break;
-	default:
-		break;
-	}
-
-	m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + Offset);
-
-	return RetTLSMessage;
-}
 
 
 
 
 
-std::shared_ptr<ITLSMessage> TLSStateServer::GetHandshakeMsg()
-{
-	std::shared_ptr<ITLSMessage> RetTLSMessage = nullptr;
-	HandshakeHeaderSerialized* HSHeader = reinterpret_cast<HandshakeHeaderSerialized*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
-	unsigned int HSHeaderLength = GetHSHeaderLength();
 
-	// Only proceed if we have the full handshake message. Otherwise wait for more bytes.
-	// Note that this is because according to the RFC, a TLS message of any type (Handshake/Alert/Application/CCS)
-	// MAY be split across several record layer messages!
-	if (HSHeaderLength > m_CurrentMessageBuffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeaderSerialized))
-	{
-		return nullptr;
-	}
-
-
-	size_t Offset = 0;
-
-	switch (HSHeader->msg_type)
-	{
-	case HandshakeType::hello_request:
-		break;
-	case HandshakeType::server_hello:
-		RetTLSMessage = std::make_shared<ServerHello>(m_CurrentMessageBuffer, Offset);
-		break;
-	case HandshakeType::certificate:
-		RetTLSMessage = std::make_shared<Certificate>(m_CurrentMessageBuffer, Offset, HSHeaderLength);
-		break;
-	case HandshakeType::server_key_exchange:
-		break;
-	case HandshakeType::certificate_request:
-		break;
-	case HandshakeType::server_hello_done:
-		break;
-	case HandshakeType::certificate_verify:
-		break;
-	case HandshakeType::finished:
-		break;
-	default:
-		break;
-	}
-
-	m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + Offset);
-
-	return RetTLSMessage;
-}

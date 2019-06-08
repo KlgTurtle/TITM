@@ -132,8 +132,14 @@
     <ClCompile Include="ITLSHandshakeMessage.cpp">
       <Filter>TLSMessages</Filter>
     </ClCompile>
-    <ClCompile Include="Certificate.cpp">
+    <ClCompile Include="ServerCertificate.cpp">
       <Filter>TLSMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="TLSStateClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TLSStateServer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -257,8 +263,20 @@
     <ClInclude Include="ITLSHandshakeMessage.h">
       <Filter>TLSMessages</Filter>
     </ClInclude>
-    <ClInclude Include="Certificate.h">
+    <ClInclude Include="ClientCertificate.h">
       <Filter>TLSMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerCertificate.h">
+      <Filter>TLSMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TLSStateClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TLSStateServer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

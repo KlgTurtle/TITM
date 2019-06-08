@@ -70,6 +70,19 @@ public:
 		return Field;
 	}
 
+	static unsigned int Deserialize3BytesInt(const std::vector<char>& Buffer, size_t& Offset)
+	{
+		std::vector<unsigned char> WorkBuf;
+		WorkBuf.resize(sizeof(unsigned int));
+		WorkBuf[0] = 0x00;
+		memcpy(&WorkBuf[1], &Buffer[Offset], sizeof(unsigned int) - 1);
+		Offset += sizeof(unsigned int) - 1;
+		
+		unsigned int Result = ntohl(*reinterpret_cast<unsigned long*>(WorkBuf.data()));
+
+		return Result;
+	}
+
 	template <class FieldType>
 	static void Serialize(FieldType Field, std::vector<char>& Buffer, size_t& Offset)
 	{
@@ -133,6 +146,18 @@ public:
 			memcpy(&Buffer[Offset], &FieldBE, sizeof(FieldBE));
 		}
 		Offset += sizeof(Field);
+	}
+
+	static void Serialize3BytesInt(unsigned int Field, std::vector<char>& Buffer, size_t& Offset)
+	{
+		if (Buffer.size() > 0)
+		{
+			unsigned int FieldBE = htonl(Field);
+			char* pFieldBE = reinterpret_cast<char*>(&FieldBE);
+			memcpy(&Buffer[Offset], pFieldBE + 1, sizeof(unsigned int) - 1);
+		}
+
+		Offset += sizeof(unsigned int) - 1;
 	}
 	
 	template <class FieldType, class LengthType>

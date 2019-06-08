@@ -5,7 +5,8 @@
 #include "TcpSocket.h"
 #include <memory>
 #include "TITMParms.h"
-#include "TLSState.h"
+#include "TLSStateClient.h"
+#include "TLSStateServer.h"
 
 
 	enum class TcpProxyDirection
