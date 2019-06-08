@@ -53,63 +53,6 @@ void TLSState::Update(const std::vector<char>& DataBuffer, std::vector<std::shar
 	}
 }
 
-std::shared_ptr<ITLSMessage> TLSState::GetHandshakeMsg()
-{
-	std::shared_ptr<ITLSMessage> RetTLSMessage = nullptr;
-
-	HandshakeHeaderSerialized* HSHeader = reinterpret_cast<HandshakeHeaderSerialized*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
-
-	std::vector<unsigned char> HSHeaderLengthBuf;
-	HSHeaderLengthBuf.resize(sizeof(unsigned int));
-	memset(HSHeaderLengthBuf.data(), 0x00, HSHeaderLengthBuf.size());
-	memcpy(&HSHeaderLengthBuf[1], HSHeader->length, sizeof(HSHeader->length));
-	
-	unsigned int HSHeaderLength = ntohl(*reinterpret_cast<unsigned long*>(HSHeaderLengthBuf.data()));
-	
-	// Only proceed if we have the full handshake message. Otherwise wait for more bytes.
-	// Note that this is because according to the RFC, a TLS message of any type (Handshake/Alert/Application/CCS)
-	// MAY be split across several record layer messages!
-	if (HSHeaderLength > m_CurrentMessageBuffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeaderSerialized))
-	{
-		return nullptr;
-	}
-
-
-	size_t Offset = 0;
-
-	switch (HSHeader->msg_type)
-	{
-	case HandshakeType::hello_request:
-		break;
-	case HandshakeType::client_hello:
-		RetTLSMessage = std::make_shared<ClientHello>(m_CurrentMessageBuffer, Offset);
-		break;
-	case HandshakeType::server_hello:
-		RetTLSMessage = std::make_shared<ServerHello>(m_CurrentMessageBuffer, Offset);
-		break;
-	case HandshakeType::certificate:
-		RetTLSMessage = std::make_shared<Certificate>(m_CurrentMessageBuffer, Offset);
-		break;
-	case HandshakeType::server_key_exchange:
-		break;
-	case HandshakeType::certificate_request:
-		break;
-	case HandshakeType::server_hello_done:
-		break;
-	case HandshakeType::certificate_verify:
-		break;
-	case HandshakeType::client_key_exchange:
-		break;
-	case HandshakeType::finished:
-		break;
-	default:
-		break;
-	}
-
-	m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + Offset);
-
-	return RetTLSMessage;
-}
 
 std::shared_ptr<ITLSMessage> TLSState::GetChangeCipherSpecMsg()
 {
@@ -132,7 +75,114 @@ std::shared_ptr<ITLSMessage> TLSState::GetAlertMsg()
 	return nullptr;
 }
 
+unsigned int TLSState::GetHSHeaderLength()
+{
+	HandshakeHeaderSerialized* HSHeader = reinterpret_cast<HandshakeHeaderSerialized*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
+
+	std::vector<unsigned char> HSHeaderLengthBuf;
+	HSHeaderLengthBuf.resize(sizeof(unsigned int));
+	memset(HSHeaderLengthBuf.data(), 0x00, HSHeaderLengthBuf.size());
+	memcpy(&HSHeaderLengthBuf[1], HSHeader->length, sizeof(HSHeader->length));
+
+	unsigned int HSHeaderLength = ntohl(*reinterpret_cast<unsigned long*>(HSHeaderLengthBuf.data()));
+
+	return HSHeaderLength;
+}
+
+TLSStateClient::TLSStateClient()
+{
+}
+
+TLSStateServer::TLSStateServer()
+{
+}
+
+std::shared_ptr<ITLSMessage> TLSStateClient::GetHandshakeMsg()
+{
+	std::shared_ptr<ITLSMessage> RetTLSMessage = nullptr;
+	HandshakeHeaderSerialized* HSHeader = reinterpret_cast<HandshakeHeaderSerialized*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
+	unsigned int HSHeaderLength = GetHSHeaderLength();
+
+	// Only proceed if we have the full handshake message. Otherwise wait for more bytes.
+	// Note that this is because according to the RFC, a TLS message of any type (Handshake/Alert/Application/CCS)
+	// MAY be split across several record layer messages!
+	if (HSHeaderLength > m_CurrentMessageBuffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeaderSerialized))
+	{
+		return nullptr;
+	}
+
+
+	size_t Offset = 0;
+
+	switch (HSHeader->msg_type)
+	{
+	case HandshakeType::client_hello:
+		RetTLSMessage = std::make_shared<ClientHello>(m_CurrentMessageBuffer, Offset);
+		break;
+	case HandshakeType::certificate:
+		RetTLSMessage = std::make_shared<Certificate>(m_CurrentMessageBuffer, Offset, HSHeaderLength);
+		break;
+	case HandshakeType::certificate_verify:
+		break;
+	case HandshakeType::client_key_exchange:
+		break;
+	case HandshakeType::finished:
+		break;
+	default:
+		break;
+	}
+
+	m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + Offset);
+
+	return RetTLSMessage;
+}
 
 
 
 
+
+std::shared_ptr<ITLSMessage> TLSStateServer::GetHandshakeMsg()
+{
+	std::shared_ptr<ITLSMessage> RetTLSMessage = nullptr;
+	HandshakeHeaderSerialized* HSHeader = reinterpret_cast<HandshakeHeaderSerialized*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
+	unsigned int HSHeaderLength = GetHSHeaderLength();
+
+	// Only proceed if we have the full handshake message. Otherwise wait for more bytes.
+	// Note that this is because according to the RFC, a TLS message of any type (Handshake/Alert/Application/CCS)
+	// MAY be split across several record layer messages!
+	if (HSHeaderLength > m_CurrentMessageBuffer.size() - sizeof(TLSPlaintextHeader) - sizeof(HandshakeHeaderSerialized))
+	{
+		return nullptr;
+	}
+
+
+	size_t Offset = 0;
+
+	switch (HSHeader->msg_type)
+	{
+	case HandshakeType::hello_request:
+		break;
+	case HandshakeType::server_hello:
+		RetTLSMessage = std::make_shared<ServerHello>(m_CurrentMessageBuffer, Offset);
+		break;
+	case HandshakeType::certificate:
+		RetTLSMessage = std::make_shared<Certificate>(m_CurrentMessageBuffer, Offset, HSHeaderLength);
+		break;
+	case HandshakeType::server_key_exchange:
+		break;
+	case HandshakeType::certificate_request:
+		break;
+	case HandshakeType::server_hello_done:
+		break;
+	case HandshakeType::certificate_verify:
+		break;
+	case HandshakeType::finished:
+		break;
+	default:
+		break;
+	}
+
+	m_CurrentMessageBuffer.erase(m_CurrentMessageBuffer.begin(), m_CurrentMessageBuffer.begin() + Offset);
+
+	return RetTLSMessage;
+}

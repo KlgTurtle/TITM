@@ -37,7 +37,7 @@ protected:
 	bool            m_bStopped;
 	TITMParms       m_Parms;
 
-	TLSState m_SourceTLSState;
-	TLSState m_TargetTLSState;
+	TLSStateClient m_SourceTLSState;
+	TLSStateServer m_TargetTLSState;
 	
 };

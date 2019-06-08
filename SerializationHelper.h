@@ -6,6 +6,7 @@
 enum class UCharLength : unsigned char {};
 enum class UShortLength : unsigned short {};
 enum class UCharType : unsigned char {};
+
 template<typename E>
 constexpr auto to_integral(E e) -> typename std::underlying_type<E>::type
 {

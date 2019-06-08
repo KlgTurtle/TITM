@@ -31,19 +31,18 @@ struct CertificateEntry
 	std::vector<std::shared_ptr<ITLSExtension>> extensions;
 };
 
-struct Certificate : public ITLSHandshakeMessage
+struct ServerCertificate : public ITLSHandshakeMessage
 {
 public:
-	Certificate(const std::vector<char>& Buffer, size_t& Offset);
+	ServerCertificate(const std::vector<char>& Buffer, size_t& Offset);
 
 	virtual std::string ToString();
 
 	virtual HandshakeType GetHandshakeType() { return HandshakeType::certificate; }
 
-	unsigned char ChangeCipherSpecMsg;
+	std::vector<std::vector<char>> Certificates;
 
 protected:
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
 	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);
-
 };
