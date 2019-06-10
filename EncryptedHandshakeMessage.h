@@ -1,16 +1,16 @@
 #pragma once
 #include "ITLSMessage.h"
 
-struct ChangeCipherSpec : public ITLSMessage
+struct EncryptedHandshakeMessage : public ITLSMessage
 {
 public:
-	ChangeCipherSpec(const std::vector<char>& Buffer, size_t& Offset);
+	EncryptedHandshakeMessage(const std::vector<char>& Buffer, size_t& Offset);
 
 	virtual std::string ToString();
 
-	virtual ContentType GetType() { return ContentType::change_cipher_spec; }
+	virtual ContentType GetType() { return ContentType::handshake; }
 
-	unsigned char ChangeCipherSpecMsg;
+	std::vector<char> EncryptedData;
 
 	virtual void Deserialize(const std::vector<char>& Buffer, size_t& Offset);
 	virtual void Serialize(std::vector<char>& Buffer, size_t& Offset);

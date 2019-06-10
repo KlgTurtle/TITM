@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppLayerProtocolNegotiation.cpp" />
+    <ClCompile Include="EncryptedHandshakeMessage.cpp" />
     <ClCompile Include="ServerCertificate.cpp" />
     <ClCompile Include="ChangeCipherSpec.cpp" />
     <ClCompile Include="ClientHello.cpp" />
@@ -188,6 +189,7 @@
   <ItemGroup>
     <ClInclude Include="AppLayerProtocolNegotiation.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="EncryptedHandshakeMessage.h" />
     <ClInclude Include="ServerCertificate.h" />
     <ClInclude Include="ChangeCipherSpec.h" />
     <ClInclude Include="ClientCertificate.h" />

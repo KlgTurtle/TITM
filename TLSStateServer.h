@@ -9,4 +9,6 @@ public:
 
 protected:
 	virtual std::shared_ptr<ITLSMessage> GetHandshakeMsg();
+
+	virtual std::string GetTypeStr() { return "TLSStateServer"; }
 };

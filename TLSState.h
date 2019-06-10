@@ -15,13 +15,18 @@ public:
 protected:
 
 	virtual std::shared_ptr<ITLSMessage> GetHandshakeMsg() = 0;
+	virtual std::shared_ptr<ITLSMessage> GetEncryptedHandshakeMsg();
 	virtual std::shared_ptr<ITLSMessage> GetChangeCipherSpecMsg();
 	virtual std::shared_ptr<ITLSMessage> GetApplicationDataMsg();
 	virtual std::shared_ptr<ITLSMessage> GetAlertMsg();
 
+	virtual bool IsEncryptedHandshakeMsg();
+
 	virtual unsigned int GetHSHeaderLength();
 
 	std::vector<char>  m_CurrentMessageBuffer;
+
+	virtual std::string GetTypeStr() = 0;
 };
 
 

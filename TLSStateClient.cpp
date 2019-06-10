@@ -8,6 +8,7 @@ TLSStateClient::TLSStateClient()
 
 std::shared_ptr<ITLSMessage> TLSStateClient::GetHandshakeMsg()
 {
+
 	std::shared_ptr<ITLSMessage> RetTLSMessage = nullptr;
 	HandshakeHeaderSerialized* HSHeader = reinterpret_cast<HandshakeHeaderSerialized*>(&m_CurrentMessageBuffer[sizeof(TLSPlaintextHeader)]);
 	unsigned int HSHeaderLength = GetHSHeaderLength();

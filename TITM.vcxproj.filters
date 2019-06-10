@@ -141,6 +141,9 @@
     <ClCompile Include="TLSStateServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EncryptedHandshakeMessage.cpp">
+      <Filter>TLSMessages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TcpSocket.h">
@@ -277,6 +280,9 @@
     </ClInclude>
     <ClInclude Include="TLSStateServer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EncryptedHandshakeMessage.h">
+      <Filter>TLSMessages</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
